@@ -1,5 +1,6 @@
 using Amazon.CognitoIdentityProvider;
 using BE.TradeeHub.UserService;
+using BE.TradeeHub.UserService.Domain.Interfaces;
 using BE.TradeeHub.UserService.Mutations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -7,14 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string[] allowedDomains = builder.Configuration["AppSettings:AllowedOrigins"].Split(',');
-var cognitoAppClientId = builder.Configuration["AppSettings:Cognito:AppClientId"].ToString();
-var cognitoUserPoolId = builder.Configuration["AppSettings:Cognito:UserPoolId"].ToString();
-var cognitoAWSRegion = builder.Configuration["AppSettings:Cognito:AWSRegion"].ToString();
-
-var validIssuer = $"https://cognito-idp.{cognitoAWSRegion}.amazonaws.com/{cognitoUserPoolId}";
-var validAudience = cognitoAppClientId;
-
+var appSettings = new AppSettings(builder.Configuration);
+builder.Services.AddSingleton<IAppSettings>(appSettings);
 builder.Services.AddScoped<IAmazonCognitoIdentityProvider, AmazonCognitoIdentityProviderClient>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddCognitoIdentity();
@@ -24,7 +19,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigins",
         builder =>
         {
-            builder.WithOrigins(allowedDomains)
+            builder.WithOrigins(appSettings.AllowedDomains)
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
@@ -36,13 +31,13 @@ builder.Services.AddAuthentication(x =>
     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options =>
 {
-    options.Authority = validIssuer;
+    options.Authority = appSettings.ValidIssuer;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
-        ValidIssuer = validIssuer,
+        ValidIssuer = appSettings.ValidIssuer,
         ValidateLifetime = true,
-        ValidAudience = validAudience,
+        ValidAudience = appSettings.AppClientId,
         ValidateIssuerSigningKey = true,
         ValidateAudience = true,
     };
