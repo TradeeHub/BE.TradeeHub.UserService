@@ -1,4 +1,4 @@
-﻿namespace BE.TradeeHub.UserService.Mutations;
+﻿namespace BE.TradeeHub.UserService.Responses;
 
 public class TokenResponse
 {

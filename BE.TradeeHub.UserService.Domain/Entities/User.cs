@@ -1,9 +1,10 @@
-﻿using MongoDB.Bson;
+﻿using BE.TradeeHub.UserService.Domain.Enteties;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace BE.TradeeHub.UserService.Infrastructure.DbObjects;
+namespace BE.TradeeHub.UserService.Domain.Entities;
 
-public class UserDbObject 
+public class User
 {
     [BsonId]
     public ObjectId Id { get; set; }
@@ -14,7 +15,7 @@ public class UserDbObject
     public string CompanyName { get; set; }
     public string CompanyType { get; set; }
     public string Address { get; set; }
-    public GeneralCompanyInfoDbObject GeneralInfo { get; set; }
+    public GeneralCompanyInfo GeneralInfo { get; set; }
     public IEnumerable<ObjectId>? Staff { get; set; }
     public IEnumerable<ObjectId>? CompaniesMemberOf { get; set; }
     public DateTime CreatedDate { get; set; }

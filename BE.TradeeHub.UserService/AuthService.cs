@@ -1,23 +1,27 @@
 ﻿using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
-using BE.TradeeHub.UserService.Mutations;
+using BE.TradeeHub.UserService.Domain.Interfaces;
+using BE.TradeeHub.UserService.Requests;
+using BE.TradeeHub.UserService.Responses;
 
 namespace BE.TradeeHub.UserService;
 
 public class AuthService
 {
     private readonly IAmazonCognitoIdentityProvider _cognitoService;
-    
-    public AuthService(IAmazonCognitoIdentityProvider cognitoService)
+    private readonly IAppSettings _appSettings;
+
+    public AuthService(IAmazonCognitoIdentityProvider cognitoService, IAppSettings appSettings)
     {
         _cognitoService = cognitoService;
+        _appSettings = appSettings;
     }
     
     public async Task SignUpUserAsync(RegisterRequest request)
     {
         var signUpRequest = new SignUpRequest
         {
-            ClientId = "61u3jgn4afgsj8e7v7209fn5l",
+            ClientId = _appSettings.AppClientId,
             Username = request.Email,
             Password = request.Password,
             UserAttributes = new List<AttributeType>
@@ -80,7 +84,7 @@ public class AuthService
     {
         var authRequest = new InitiateAuthRequest
         {
-            ClientId = "61u3jgn4afgsj8e7v7209fn5l", // Replace with your actual client id
+            ClientId = _appSettings.AppClientId,
             AuthFlow = AuthFlowType.USER_PASSWORD_AUTH,
             AuthParameters = new Dictionary<string, string>
             {

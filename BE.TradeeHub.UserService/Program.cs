@@ -1,17 +1,52 @@
 using Amazon.CognitoIdentityProvider;
+using Amazon.CognitoIdentityProvider.Model;
 using Amazon.Runtime;
 using BE.TradeeHub.UserService;
 using BE.TradeeHub.UserService.Domain.Interfaces;
-using BE.TradeeHub.UserService.Mutations;
+using BE.TradeeHub.UserService.GraphQL.DataLoaders;
+using BE.TradeeHub.UserService.GraphQL.Mutations;
+using BE.TradeeHub.UserService.GraphQL.Queries;
+using BE.TradeeHub.UserService.GraphQL.QueryResolvers;
+// using BE.TradeeHub.UserService.GraphQL.Types;
+using BE.TradeeHub.UserService.Infrastructure;
+using BE.TradeeHub.UserService.Infrastructure.DbObjects;
+using BE.TradeeHub.UserService.Infrastructure.Repository;
+using BE.TradeeHub.UserService.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var appSettings = new AppSettings(builder.Configuration);
 builder.Services.AddSingleton<IAppSettings>(appSettings);
-builder.Services.AddScoped<IAmazonCognitoIdentityProvider, AmazonCognitoIdentityProviderClient>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("GraphQLCorsPolicy",
+        builder =>
+        {
+            builder.WithOrigins(appSettings.AllowedDomains)
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        });
+});
+
+builder.Services.AddCognitoIdentity();
+builder.Services.AddSingleton<MongoDbContext>();
+builder.Services.AddScoped<StaffDataLoader>();
+builder.Services.AddScoped<CompaniesMemberOfDataLoader>();
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<TypeResolver>();
+
+builder.Services.AddSingleton<IMongoCollection<UserDbObject>>(serviceProvider =>
+{
+    var mongoDbContext = serviceProvider.GetRequiredService<MongoDbContext>();
+    return mongoDbContext.Users; // Assuming this is the property name in MongoDbContext for the collection
+});
 
 // If I am on dev the setting should come from bottom right of rider aws toolkit no need to pass any values
 if (appSettings.Environment.Contains("dev", StringComparison.CurrentCultureIgnoreCase))
@@ -31,20 +66,6 @@ else
         new AmazonCognitoIdentityProviderClient(awsOptions.Credentials, appSettings.AWSRegion)
     );
 }
-
-builder.Services.AddScoped<AuthService>();
-builder.Services.AddCognitoIdentity();
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowSpecificOrigins",
-        builder =>
-        {
-            builder.WithOrigins(appSettings.AllowedDomains)
-                .AllowAnyHeader()
-                .AllowAnyMethod();
-        });
-});
 
 builder.Services.AddAuthentication(x =>
 {
@@ -66,42 +87,38 @@ builder.Services.AddAuthentication(x =>
 
 builder.Services.AddAuthorization();
 
+builder.Services
+    .AddGraphQLServer()
+    .AddDataLoader<StaffDataLoader>()
+    .AddDataLoader<CompaniesMemberOfDataLoader>()
+    .BindRuntimeType<ObjectId, IdType>()
+    .AddTypeConverter<ObjectId, string>(o => o.ToString())
+    .AddTypeConverter<string, ObjectId>(o => ObjectId.Parse(o))
+    .AddQueryType<Query>()
+    .AddMutationType<Mutation>()
+    .AddType<UserType>()
+    .AddMongoDbSorting()
+    .AddMongoDbProjections()
+    .AddMongoDbPagingProviders()
+    .AddMongoDbFiltering();
+
 var app = builder.Build();
 
-app.UseCors("AllowSpecificOrigins");
+app.UseCors("GraphQLCorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRouting();
+app.MapGraphQL();
 
-app.MapGet("/", () => "Hello World!");
-app.MapGet("/testAuth", () => "Hello TEST AUTH!").RequireAuthorization();
-app.MapGet("/testAuth2", () => "Hello TEST 22222!").RequireAuthorization();
-
-app.MapPost("/login", async ([FromBody] LoginRequest tokenRequest, AuthService authService) =>
+app.Use(async (context, next) =>
 {
-    try
+    if (context.Request.Path == "/")
     {
-        var tokenResponse = await authService.LoginAsync(tokenRequest);
-        return Results.Ok(tokenResponse);
+        context.Response.Redirect("/graphql/", permanent: false);
     }
-    catch (Exception ex)
+    else
     {
-        // Handle exceptions
-        return Results.Problem(ex.Message);
-    }
-});
-
-app.MapPost("/register", async ([FromBody] RegisterRequest registrationData, AuthService authService) =>
-{
-    try
-    {
-        // Call your Cognito service to register the user
-        await authService.SignUpUserAsync(registrationData);
-        return Results.Ok("User registered successfully.");
-    }
-    catch (Exception ex)
-    {
-        // Handle exceptions (e.g., user already exists)
-        return Results.Problem(ex.Message);
+        await next();
     }
 });
 
