@@ -5,16 +5,22 @@ namespace BE.TradeeHub.UserService;
 
 public class AppSettings : IAppSettings
 {
+    public string Environment { get; set; }
     public string AppClientId { get; set; }
     public string UserPoolId { get; set; }
     public RegionEndpoint AWSRegion { get; set; }
     public string MongoDbConnectionString { get; set; }
     public string MongoDbDatabaseName { get; set; }
-    
+    public string? AwsAccessKeyId { get; set; }
+    public string? AwsSecretAccessKey { get; set; }
     public string[] AllowedDomains { get; set; }
     public string ValidIssuer { get; set; }
+    
     public AppSettings(IConfiguration config)
     {
+        Environment = config["ASPNETCORE_ENVIRONMENT"];
+        AwsAccessKeyId = config["AWS_ACCESS_KEY_ID"];
+        AwsSecretAccessKey = config["AWS_SECRET_ACCESS_KEY"];
         AllowedDomains = config.GetSection("AppSettings:AllowedOrigins").Get<string[]>();
         MongoDbConnectionString = config.GetSection("AppSettings:MongoDB:ConnectionString").Value;
         MongoDbDatabaseName = config.GetSection("AppSettings:MongoDB:DatabaseName").Value;
