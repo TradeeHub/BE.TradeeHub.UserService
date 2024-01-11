@@ -1,5 +1,4 @@
-﻿using BE.TradeeHub.UserService.Domain.Interfaces.Repositories;
-using BE.TradeeHub.UserService.Infrastructure.DbObjects;
+﻿using BE.TradeeHub.UserService.Infrastructure.DbObjects;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -32,5 +31,20 @@ public class UserRepository(MongoDbContext dbContext)
         var companies = await cursor.ToListAsync(ctx);
 
         return companies; 
+    }
+    
+    public async Task AddUserAsync(UserDbObject user, CancellationToken cancellationToken)
+    {
+        await dbContext.Users.InsertOneAsync(user, null, cancellationToken);
+    }
+
+    public async Task UpdateUserEmailVerifiedStatus(string email, bool isVerified, CancellationToken cancellationToken)
+    {
+        var filter = Builders<UserDbObject>.Filter.Eq(u => u.Email, email);
+        var update = Builders<UserDbObject>.Update
+            .Set(u => u.EmailVerified, isVerified)
+            .Set(u => u.UpdatedDate, DateTime.UtcNow);
+        
+        await dbContext.Users.UpdateOneAsync(filter, update, null, cancellationToken);
     }
 }

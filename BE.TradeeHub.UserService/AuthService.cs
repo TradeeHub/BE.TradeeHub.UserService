@@ -1,6 +1,9 @@
 ﻿using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
 using BE.TradeeHub.UserService.Domain.Interfaces;
+using BE.TradeeHub.UserService.Domain.Interfaces.Repositories;
+using BE.TradeeHub.UserService.Infrastructure.DbObjects;
+using BE.TradeeHub.UserService.Infrastructure.Repository;
 using BE.TradeeHub.UserService.Requests;
 using BE.TradeeHub.UserService.Responses;
 
@@ -10,14 +13,48 @@ public class AuthService
 {
     private readonly IAmazonCognitoIdentityProvider _cognitoService;
     private readonly IAppSettings _appSettings;
-
-    public AuthService(IAmazonCognitoIdentityProvider cognitoService, IAppSettings appSettings)
+    private readonly UserRepository _userRepository;
+    public AuthService(IAmazonCognitoIdentityProvider cognitoService, IAppSettings appSettings, UserRepository userRepository)
     {
         _cognitoService = cognitoService;
         _appSettings = appSettings;
+        _userRepository = userRepository;
+    }
+
+    public async Task<ConfirmSignUpResponse> ConfirmRegistrationAsync(string confirmationCode, string email, CancellationToken ctx)
+    {
+        var request = new ConfirmSignUpRequest
+        {
+            ClientId = _appSettings.AppClientId,
+            Username = email,
+            ConfirmationCode = confirmationCode
+        };
+
+        var confirmationResponse =  await _cognitoService.ConfirmSignUpAsync(request, ctx);
+        
+        if (confirmationResponse.HttpStatusCode == System.Net.HttpStatusCode.OK)
+        {
+            // If the confirmation is successful, update the user in MongoDB
+            await _userRepository.UpdateUserEmailVerifiedStatus(email, true, ctx);
+        }
+
+        return confirmationResponse;
+    }
+
+    public async Task<ResendConfirmationCodeResponse> ResendConfirmationCodeAsync(string email, CancellationToken ctx)
+    {
+        var request = new ResendConfirmationCodeRequest
+        {
+            ClientId = _appSettings.AppClientId,
+            Username = email
+        };
+        
+        var response = await _cognitoService.ResendConfirmationCodeAsync(request, ctx);
+
+        return response;
     }
     
-    public async Task SignUpUserAsync(RegisterRequest request)
+    public async Task<SignUpResponse> RegisterAsync(RegisterRequest request, CancellationToken ctx)
     {
         var signUpRequest = new SignUpRequest
         {
@@ -77,7 +114,31 @@ public class AuthService
             }
         };
 
-        var response = await _cognitoService.SignUpAsync(signUpRequest);
+        var response = await _cognitoService.SignUpAsync(signUpRequest, ctx);
+
+        if (response.HttpStatusCode != System.Net.HttpStatusCode.OK) return response;
+        
+        var user = new UserDbObject
+        {
+            Email = request.Email,
+            PhoneNumber = request.PhoneNumber,
+            Name = request.Name,
+            CompanyName = request.CompanyName,
+            CompanyType = request.CompanyType,
+            Address = request.Address,
+            GeneralInfo = new GeneralCompanyInfoDbObject
+            {
+                MarketingPreference = request.MarketingPreference,
+                AnnualRevenue = request.AnnualRevenue,
+                CompanyPriority = request.CompanyPriority,
+                CompanySize = request.CompanySize
+            },
+            CreatedDate = DateTime.UtcNow,
+        };
+
+        await _userRepository.AddUserAsync(user, ctx);
+
+        return response;
     }
     
     public async Task<TokenResponse> LoginAsync(LoginRequest request)

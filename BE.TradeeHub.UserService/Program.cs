@@ -1,5 +1,4 @@
 using Amazon.CognitoIdentityProvider;
-using Amazon.CognitoIdentityProvider.Model;
 using Amazon.Runtime;
 using BE.TradeeHub.UserService;
 using BE.TradeeHub.UserService.Domain.Interfaces;
@@ -7,7 +6,7 @@ using BE.TradeeHub.UserService.GraphQL.DataLoaders;
 using BE.TradeeHub.UserService.GraphQL.Mutations;
 using BE.TradeeHub.UserService.GraphQL.Queries;
 using BE.TradeeHub.UserService.GraphQL.QueryResolvers;
-// using BE.TradeeHub.UserService.GraphQL.Types;
+using BE.TradeeHub.UserService.GraphQL.Types;
 using BE.TradeeHub.UserService.Infrastructure;
 using BE.TradeeHub.UserService.Infrastructure.DbObjects;
 using BE.TradeeHub.UserService.Infrastructure.Repository;
@@ -36,11 +35,13 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddCognitoIdentity();
 builder.Services.AddSingleton<MongoDbContext>();
+builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<StaffDataLoader>();
 builder.Services.AddScoped<CompaniesMemberOfDataLoader>();
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<TypeResolver>();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSingleton<IMongoCollection<UserDbObject>>(serviceProvider =>
 {
@@ -89,6 +90,7 @@ builder.Services.AddAuthorization();
 
 builder.Services
     .AddGraphQLServer()
+    .AddAuthorization()
     .AddDataLoader<StaffDataLoader>()
     .AddDataLoader<CompaniesMemberOfDataLoader>()
     .BindRuntimeType<ObjectId, IdType>()

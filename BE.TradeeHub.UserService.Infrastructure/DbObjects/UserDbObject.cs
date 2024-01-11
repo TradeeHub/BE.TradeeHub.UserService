@@ -18,7 +18,7 @@ public class UserDbObject
     public IEnumerable<ObjectId>? Staff { get; set; }
     public IEnumerable<ObjectId>? CompaniesMemberOf { get; set; }
     public DateTime CreatedDate { get; set; }
-    public DateTime UpdatedDate { get; set; }
+    public DateTime? UpdatedDate { get; set; }
     public bool EmailVerified { get; set; }
     public bool PhoneVerified { get; set; }
 }

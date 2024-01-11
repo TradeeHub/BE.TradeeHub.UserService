@@ -1,8 +1,10 @@
 ﻿using BE.TradeeHub.UserService.GraphQL.QueryResolvers;
 using BE.TradeeHub.UserService.Infrastructure.DbObjects;
+using HotChocolate.Authorization;
 
 namespace BE.TradeeHub.UserService.GraphQL.Types;
 
+[Authorize]
 public class UserType : ObjectType<UserDbObject>
 {
     protected override void Configure(IObjectTypeDescriptor<UserDbObject> descriptor)
