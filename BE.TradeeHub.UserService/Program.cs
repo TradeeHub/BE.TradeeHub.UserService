@@ -84,6 +84,18 @@ builder.Services.AddAuthentication(x =>
         ValidateIssuerSigningKey = true,
         ValidateAudience = true,
     };
+    
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            if (context.Request.Cookies.ContainsKey("jwt"))
+            {
+                context.Token = context.Request.Cookies["jwt"];
+            }
+            return Task.CompletedTask;
+        }
+    };
 });
 
 builder.Services.AddAuthorization();
