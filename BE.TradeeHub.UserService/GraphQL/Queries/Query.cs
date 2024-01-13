@@ -14,11 +14,11 @@ public class Query
     // [UseProjection]
     // [UseSorting]
     // [UseFiltering]
-    public IExecutable<UserDbObject> GetUsers([Service] IMongoCollection<UserDbObject> collection, CancellationToken ctx)
-    {
-        var collect = collection.AsExecutable();
-        return collect;
-    }
+    // public IExecutable<UserDbObject> GetUsers([Service] IMongoCollection<UserDbObject> collection, CancellationToken ctx)
+    // {
+    //     var collect = collection.AsExecutable();
+    //     return collect;
+    // }
     
     public async Task<TokenResponse> LoginAsync(LoginRequest request, [Service] AuthService authService, [Service] IHttpContextAccessor httpContextAccessor)
     {
@@ -48,9 +48,9 @@ public class Query
         }
     }
     
-    [Authorize]
-    public async Task<UserDbObject> TestAuth()
-    {
-        return new UserDbObject() { Name = "Glen" };
-    }
+    // [Authorize]
+    // public async Task<UserDbObject> TestAuth()
+    // {
+    //     return new UserDbObject() { Name = "Glen" };
+    // }
 }

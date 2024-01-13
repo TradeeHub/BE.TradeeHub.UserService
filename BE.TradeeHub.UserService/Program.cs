@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Amazon.CognitoIdentityProvider;
 using Amazon.Runtime;
 using BE.TradeeHub.UserService;
@@ -11,6 +12,7 @@ using BE.TradeeHub.UserService.Infrastructure;
 using BE.TradeeHub.UserService.Infrastructure.DbObjects;
 using BE.TradeeHub.UserService.Infrastructure.Repository;
 using BE.TradeeHub.UserService.Services;
+using HotChocolate.Execution;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson;
@@ -105,6 +107,20 @@ builder.Services
     .AddMongoDbFiltering();
 
 var app = builder.Build();
+
+if(Debugger.IsAttached)
+{
+    var resolver = app.Services.GetService<IRequestExecutorResolver>();
+    var executor = resolver?.GetRequestExecutorAsync().Result;
+    if (executor != null)
+    {
+        const string schemaFile = "schema.graphql";
+        var newSchema = executor.Schema.ToString();
+        var oldSchema = File.ReadAllText(schemaFile);
+        if (newSchema != oldSchema)
+            File.WriteAllText(schemaFile, newSchema);
+    }
+}
 
 app.UseCors("GraphQLCorsPolicy");
 app.UseAuthentication();

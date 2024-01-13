@@ -1,0 +1,208 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type CodeDeliveryDetailsType {
+  attributeName: String
+  deliveryMedium: DeliveryMediumType
+  destination: String
+}
+
+type ConfirmSignUpResponse {
+  responseMetadata: ResponseMetadata
+  contentLength: Long!
+  httpStatusCode: HttpStatusCode!
+}
+
+type DeliveryMediumType {
+  value: String
+}
+
+type GeneralCompanyInfoDbObject {
+  marketingPreference: String!
+  annualRevenue: String!
+  companyPriority: String!
+  companySize: String!
+}
+
+type KeyValuePairOfStringAndString {
+  key: String!
+  value: String!
+}
+
+type Mutation {
+  register(request: RegisterRequestInput!): SignUpResponse!
+  confirmRegistration(confirmationCode: String! email: String!): ConfirmSignUpResponse!
+  resendConfirmationCode(email: String!): ResendConfirmationCodeResponse!
+}
+
+type Query {
+  login(request: LoginRequestInput!): TokenResponse!
+}
+
+type ResendConfirmationCodeResponse {
+  codeDeliveryDetails: CodeDeliveryDetailsType
+  responseMetadata: ResponseMetadata
+  contentLength: Long!
+  httpStatusCode: HttpStatusCode!
+}
+
+type ResponseMetadata {
+  requestId: String
+  metadata: [KeyValuePairOfStringAndString!]
+  checksumAlgorithm: CoreChecksumAlgorithm!
+  checksumValidationStatus: ChecksumValidationStatus!
+}
+
+type SignUpResponse {
+  codeDeliveryDetails: CodeDeliveryDetailsType
+  userConfirmed: Boolean!
+  userSub: String
+  responseMetadata: ResponseMetadata
+  contentLength: Long!
+  httpStatusCode: HttpStatusCode!
+}
+
+type TokenResponse {
+  idToken: String!
+  accessToken: String!
+  refreshToken: String!
+}
+
+type UserDbObject {
+  staff: [UserDbObject]
+  companiesMemberOf: [UserDbObject]
+  id: ID!
+  awsCognitoUserId: UUID!
+  email: String!
+  phoneNumber: String!
+  name: String!
+  companyName: String!
+  companyType: String!
+  address: String!
+  generalInfo: GeneralCompanyInfoDbObject!
+  createdDate: DateTime!
+  updatedDate: DateTime
+  emailVerified: Boolean!
+  phoneVerified: Boolean!
+}
+
+input LoginRequestInput {
+  username: String!
+  password: String!
+}
+
+input RegisterRequestInput {
+  email: String!
+  password: String!
+  name: String!
+  phoneNumber: String!
+  address: String!
+  companyName: String!
+  companyPriority: String!
+  companySize: String!
+  companyType: String!
+  marketingPreference: String!
+  annualRevenue: String!
+}
+
+enum ApplyPolicy {
+  BEFORE_RESOLVER
+  AFTER_RESOLVER
+  VALIDATION
+}
+
+enum ChecksumValidationStatus {
+  NOT_VALIDATED
+  PENDING_RESPONSE_READ
+  SUCCESSFUL
+  INVALID
+}
+
+enum CoreChecksumAlgorithm {
+  NONE
+  CRC32C
+  CRC32
+  SHA256
+  SHA1
+}
+
+enum HttpStatusCode {
+  CONTINUE
+  SWITCHING_PROTOCOLS
+  PROCESSING
+  EARLY_HINTS
+  OK
+  CREATED
+  ACCEPTED
+  NON_AUTHORITATIVE_INFORMATION
+  NO_CONTENT
+  RESET_CONTENT
+  PARTIAL_CONTENT
+  MULTI_STATUS
+  ALREADY_REPORTED
+  IM_USED
+  MULTIPLE_CHOICES
+  MOVED_PERMANENTLY
+  FOUND
+  SEE_OTHER
+  NOT_MODIFIED
+  USE_PROXY
+  UNUSED
+  REDIRECT_KEEP_VERB
+  PERMANENT_REDIRECT
+  BAD_REQUEST
+  UNAUTHORIZED
+  PAYMENT_REQUIRED
+  FORBIDDEN
+  NOT_FOUND
+  METHOD_NOT_ALLOWED
+  NOT_ACCEPTABLE
+  PROXY_AUTHENTICATION_REQUIRED
+  REQUEST_TIMEOUT
+  CONFLICT
+  GONE
+  LENGTH_REQUIRED
+  PRECONDITION_FAILED
+  REQUEST_ENTITY_TOO_LARGE
+  REQUEST_URI_TOO_LONG
+  UNSUPPORTED_MEDIA_TYPE
+  REQUESTED_RANGE_NOT_SATISFIABLE
+  EXPECTATION_FAILED
+  MISDIRECTED_REQUEST
+  UNPROCESSABLE_ENTITY
+  LOCKED
+  FAILED_DEPENDENCY
+  UPGRADE_REQUIRED
+  PRECONDITION_REQUIRED
+  TOO_MANY_REQUESTS
+  REQUEST_HEADER_FIELDS_TOO_LARGE
+  UNAVAILABLE_FOR_LEGAL_REASONS
+  INTERNAL_SERVER_ERROR
+  NOT_IMPLEMENTED
+  BAD_GATEWAY
+  SERVICE_UNAVAILABLE
+  GATEWAY_TIMEOUT
+  HTTP_VERSION_NOT_SUPPORTED
+  VARIANT_ALSO_NEGOTIATES
+  INSUFFICIENT_STORAGE
+  LOOP_DETECTED
+  NOT_EXTENDED
+  NETWORK_AUTHENTICATION_REQUIRED
+}
+
+directive @allowAnonymous repeatable on FIELD_DEFINITION
+
+directive @authorize("The name of the authorization policy that determines access to the annotated resource." policy: String "Roles that are allowed to access the annotated resource." roles: [String!] "Defines when when the authorize directive shall be applied.By default the authorize directives are applied during the validation phase." apply: ApplyPolicy! = BEFORE_RESOLVER) repeatable on OBJECT | FIELD_DEFINITION
+
+"The `@specifiedBy` directive is used within the type system definition language to provide a URL for specifying the behavior of custom scalar definitions."
+directive @specifiedBy("The specifiedBy URL points to a human-readable specification. This field will only read a result for scalar types." url: String!) on SCALAR
+
+"The `DateTime` scalar represents an ISO-8601 compliant date time type."
+scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
+
+"The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
+scalar Long
+
+scalar UUID @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc4122")
