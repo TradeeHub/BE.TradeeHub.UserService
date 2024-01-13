@@ -1,1 +1,1 @@
-{"subgraph":"UserServiceSubgraph","http":{"baseAddress":"http://172.18.0.1:5225/graphql"}}
+{"subgraph":"UserServiceSubgraph","http":{"baseAddress":"http://172.17.0.1:5225/graphql"}}
