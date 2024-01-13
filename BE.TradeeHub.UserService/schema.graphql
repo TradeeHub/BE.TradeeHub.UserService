@@ -33,6 +33,7 @@ type KeyValuePairOfStringAndString {
 
 type Mutation {
   register(request: RegisterRequestInput!): SignUpResponse!
+  addRandomUser(request: RegisterRequestInput!): UserDbObject!
   confirmRegistration(confirmationCode: String! email: String!): ConfirmSignUpResponse!
   resendConfirmationCode(email: String!): ResendConfirmationCodeResponse!
 }

@@ -21,6 +21,21 @@ public class Mutation
             throw new QueryException(ex.Message);
         }
     }
+    
+    public async Task<UserDbObject> AddRandomUser([Service] AuthService authService, RegisterRequest request,
+        CancellationToken ctx)
+    {
+        try
+        {
+            var response = await authService.AddRandomUser(request, ctx);
+            
+            return response;
+        }
+        catch (Exception ex)
+        {
+            throw new QueryException(ex.Message);
+        }
+    }
 
     public async Task<ConfirmSignUpResponse> ConfirmRegistrationAsync([Service] AuthService authService,
         string confirmationCode, string email, CancellationToken ctx)

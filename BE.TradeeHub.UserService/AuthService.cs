@@ -54,6 +54,32 @@ public class AuthService
         return response;
     }
     
+        public async Task<UserDbObject> AddRandomUser(RegisterRequest request, CancellationToken ctx)
+    {
+        
+        var user = new UserDbObject
+        {
+            Email = request.Email,
+            PhoneNumber = request.PhoneNumber,
+            Name = request.Name,
+            CompanyName = request.CompanyName,
+            CompanyType = request.CompanyType,
+            Address = request.Address,
+            GeneralInfo = new GeneralCompanyInfoDbObject
+            {
+                MarketingPreference = request.MarketingPreference,
+                AnnualRevenue = request.AnnualRevenue,
+                CompanyPriority = request.CompanyPriority,
+                CompanySize = request.CompanySize
+            },
+            CreatedDate = DateTime.UtcNow,
+        };
+
+        await _userRepository.AddUserAsync(user, ctx);
+
+        return user;
+    } 
+    
     public async Task<SignUpResponse> RegisterAsync(RegisterRequest request, CancellationToken ctx)
     {
         var signUpRequest = new SignUpRequest

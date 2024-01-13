@@ -42,6 +42,17 @@ public class AppSettings : IAppSettings
         {
             throw new ApplicationException("Missing required configuration value: AppSettings.UserPoolId");
         }
+        
+        if (string.IsNullOrEmpty(AwsAccessKeyId))
+        {
+            throw new ApplicationException("Missing required configuration value: AppSettings.AwsAccessKeyId");
+        }
+
+        if (string.IsNullOrEmpty(AwsSecretAccessKey))
+        {
+            throw new ApplicationException("Missing required configuration value: AppSettings.AwsSecretAccessKey");
+        }
+
 
         if (AWSRegion == null)
         {

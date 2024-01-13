@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Amazon.CognitoIdentityProvider;
 using Amazon.Runtime;
 using BE.TradeeHub.UserService;
@@ -120,7 +119,8 @@ builder.Services
 
 var app = builder.Build();
 
-if(Debugger.IsAttached)
+
+if (appSettings.Environment is "Development" or "Docker")
 {
     var resolver = app.Services.GetService<IRequestExecutorResolver>();
     var executor = resolver?.GetRequestExecutorAsync().Result;

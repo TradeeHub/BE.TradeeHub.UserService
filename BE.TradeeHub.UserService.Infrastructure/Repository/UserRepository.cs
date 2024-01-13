@@ -4,12 +4,18 @@ using MongoDB.Driver;
 
 namespace BE.TradeeHub.UserService.Infrastructure.Repository;
 
-public class UserRepository(MongoDbContext dbContext)
+public class UserRepository
 {
+    private readonly MongoDbContext _dbContext;
+
+    public UserRepository(MongoDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
     public async Task<UserDbObject> GetCustomerById(ObjectId userId)
     {
         var filter = Builders<UserDbObject>.Filter.Eq(c => c.Id, userId);
-        var user =  await dbContext.Users.Find(filter).FirstOrDefaultAsync();
+        var user =  await _dbContext.Users.Find(filter).FirstOrDefaultAsync();
         return user;
     }
     
@@ -17,7 +23,7 @@ public class UserRepository(MongoDbContext dbContext)
     {
         // The filter should be on the Customers field, not the Id field
         var filter = Builders<UserDbObject>.Filter.AnyIn(p => p.Staff, staffIds);
-        var cursor = await dbContext.Users.FindAsync(filter, cancellationToken: ctx);
+        var cursor = await _dbContext.Users.FindAsync(filter, cancellationToken: ctx);
         var staff = await cursor.ToListAsync(ctx);
 
         return staff; 
@@ -27,7 +33,7 @@ public class UserRepository(MongoDbContext dbContext)
     {
         // The filter should be on the Customers field, not the Id field
         var filter = Builders<UserDbObject>.Filter.AnyIn(p => p.CompaniesMemberOf, companyIds);
-        var cursor = await dbContext.Users.FindAsync(filter, cancellationToken: ctx);
+        var cursor = await _dbContext.Users.FindAsync(filter, cancellationToken: ctx);
         var companies = await cursor.ToListAsync(ctx);
 
         return companies; 
@@ -35,7 +41,14 @@ public class UserRepository(MongoDbContext dbContext)
     
     public async Task AddUserAsync(UserDbObject user, CancellationToken cancellationToken)
     {
-        await dbContext.Users.InsertOneAsync(user, null, cancellationToken);
+        try
+        {
+            await _dbContext.Users.InsertOneAsync(user, null, cancellationToken);
+        }
+        catch (Exception e)
+        {
+            var error = e.Message;
+        }
     }
 
     public async Task UpdateUserEmailVerifiedStatus(string email, bool isVerified, CancellationToken cancellationToken)
@@ -45,6 +58,6 @@ public class UserRepository(MongoDbContext dbContext)
             .Set(u => u.EmailVerified, isVerified)
             .Set(u => u.UpdatedDate, DateTime.UtcNow);
         
-        await dbContext.Users.UpdateOneAsync(filter, update, null, cancellationToken);
+        await _dbContext.Users.UpdateOneAsync(filter, update, null, cancellationToken);
     }
 }
