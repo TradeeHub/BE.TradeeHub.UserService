@@ -3,6 +3,12 @@ schema {
   mutation: Mutation
 }
 
+type AccountConfirmationResponse {
+  confirmSignUpResponse: ConfirmSignUpResponse
+  isConfirmationSuccess: Boolean!
+  message: String
+}
+
 type CodeDeliveryDetailsType {
   attributeName: String
   deliveryMedium: DeliveryMediumType
@@ -31,15 +37,33 @@ type KeyValuePairOfStringAndString {
   value: String!
 }
 
+type LoginResponse {
+  isSuccess: Boolean!
+  isConfirmed: Boolean!
+  user: UserDbObject
+}
+
 type Mutation {
   register(request: RegisterRequestInput!): SignUpResponse!
-  addRandomUser(request: RegisterRequestInput!): UserDbObject!
-  confirmRegistration(confirmationCode: String! email: String!): ConfirmSignUpResponse!
-  resendConfirmationCode(email: String!): ResendConfirmationCodeResponse!
+  login(request: LoginRequestInput!): LoginResponse!
+  confirmAccount(confirmationCode: String! email: String!): AccountConfirmationResponse!
+  resendVerificationCode(email: String!): ResendConfirmationCodeResponse!
+}
+
+"Information about pagination in a connection."
+type PageInfo {
+  "Indicates whether more edges exist following the set defined by the clients arguments."
+  hasNextPage: Boolean!
+  "Indicates whether more edges exist prior the set defined by the clients arguments."
+  hasPreviousPage: Boolean!
+  "When paginating backwards, the cursor to continue."
+  startCursor: String
+  "When paginating forwards, the cursor to continue."
+  endCursor: String
 }
 
 type Query {
-  login(request: LoginRequestInput!): TokenResponse!
+  users("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String order_by: UserDbObjectSort where: UserDbObjectFilter): UsersConnection
 }
 
 type ResendConfirmationCodeResponse {
@@ -65,12 +89,6 @@ type SignUpResponse {
   httpStatusCode: HttpStatusCode!
 }
 
-type TokenResponse {
-  idToken: String!
-  accessToken: String!
-  refreshToken: String!
-}
-
 type UserDbObject {
   staff: [UserDbObject]
   companiesMemberOf: [UserDbObject]
@@ -89,9 +107,144 @@ type UserDbObject {
   phoneVerified: Boolean!
 }
 
+"A connection to a list of items."
+type UsersConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [UsersEdge!]
+  "A flattened list of the nodes."
+  nodes: [UserDbObject!]
+}
+
+"An edge in a connection."
+type UsersEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: UserDbObject!
+}
+
+input GeneralCompanyInfoDbObjectFilter {
+  AND: [GeneralCompanyInfoDbObjectFilter!]
+  OR: [GeneralCompanyInfoDbObjectFilter!]
+  marketingPreference: String
+  marketingPreference_not: String
+  marketingPreference_contains: String
+  marketingPreference_not_contains: String
+  marketingPreference_starts_with: String
+  marketingPreference_not_starts_with: String
+  marketingPreference_ends_with: String
+  marketingPreference_not_ends_with: String
+  marketingPreference_in: [String!]
+  marketingPreference_not_in: [String!]
+  annualRevenue: String
+  annualRevenue_not: String
+  annualRevenue_contains: String
+  annualRevenue_not_contains: String
+  annualRevenue_starts_with: String
+  annualRevenue_not_starts_with: String
+  annualRevenue_ends_with: String
+  annualRevenue_not_ends_with: String
+  annualRevenue_in: [String!]
+  annualRevenue_not_in: [String!]
+  companyPriority: String
+  companyPriority_not: String
+  companyPriority_contains: String
+  companyPriority_not_contains: String
+  companyPriority_starts_with: String
+  companyPriority_not_starts_with: String
+  companyPriority_ends_with: String
+  companyPriority_not_ends_with: String
+  companyPriority_in: [String!]
+  companyPriority_not_in: [String!]
+  companySize: String
+  companySize_not: String
+  companySize_contains: String
+  companySize_not_contains: String
+  companySize_starts_with: String
+  companySize_not_starts_with: String
+  companySize_ends_with: String
+  companySize_not_ends_with: String
+  companySize_in: [String!]
+  companySize_not_in: [String!]
+}
+
+input GeneralCompanyInfoDbObjectSort {
+  marketingPreference: SortOperationKind
+  annualRevenue: SortOperationKind
+  companyPriority: SortOperationKind
+  companySize: SortOperationKind
+}
+
 input LoginRequestInput {
   username: String!
   password: String!
+}
+
+input ObjectIdFilter {
+  AND: [ObjectIdFilter!]
+  OR: [ObjectIdFilter!]
+  timestamp: Int
+  timestamp_not: Int
+  timestamp_in: [Int!]
+  timestamp_not_in: [Int!]
+  timestamp_gt: Int
+  timestamp_not_gt: Int
+  timestamp_gte: Int
+  timestamp_not_gte: Int
+  timestamp_lt: Int
+  timestamp_not_lt: Int
+  timestamp_lte: Int
+  timestamp_not_lte: Int
+  machine: Int
+  machine_not: Int
+  machine_in: [Int!]
+  machine_not_in: [Int!]
+  machine_gt: Int
+  machine_not_gt: Int
+  machine_gte: Int
+  machine_not_gte: Int
+  machine_lt: Int
+  machine_not_lt: Int
+  machine_lte: Int
+  machine_not_lte: Int
+  pid: Short
+  pid_not: Short
+  pid_in: [Short!]
+  pid_not_in: [Short!]
+  pid_gt: Short
+  pid_not_gt: Short
+  pid_gte: Short
+  pid_not_gte: Short
+  pid_lt: Short
+  pid_not_lt: Short
+  pid_lte: Short
+  pid_not_lte: Short
+  increment: Int
+  increment_not: Int
+  increment_in: [Int!]
+  increment_not_in: [Int!]
+  increment_gt: Int
+  increment_not_gt: Int
+  increment_gte: Int
+  increment_not_gte: Int
+  increment_lt: Int
+  increment_not_lt: Int
+  increment_lte: Int
+  increment_not_lte: Int
+  creationTime: DateTime
+  creationTime_not: DateTime
+  creationTime_in: [DateTime!]
+  creationTime_not_in: [DateTime!]
+  creationTime_gt: DateTime
+  creationTime_not_gt: DateTime
+  creationTime_gte: DateTime
+  creationTime_not_gte: DateTime
+  creationTime_lt: DateTime
+  creationTime_not_lt: DateTime
+  creationTime_lte: DateTime
+  creationTime_not_lte: DateTime
 }
 
 input RegisterRequestInput {
@@ -106,6 +259,135 @@ input RegisterRequestInput {
   companyType: String!
   marketingPreference: String!
   annualRevenue: String!
+}
+
+input UserDbObjectFilter {
+  AND: [UserDbObjectFilter!]
+  OR: [UserDbObjectFilter!]
+  awsCognitoUserId: UUID
+  awsCognitoUserId_not: UUID
+  awsCognitoUserId_in: [UUID!]
+  awsCognitoUserId_not_in: [UUID!]
+  awsCognitoUserId_gt: UUID
+  awsCognitoUserId_not_gt: UUID
+  awsCognitoUserId_gte: UUID
+  awsCognitoUserId_not_gte: UUID
+  awsCognitoUserId_lt: UUID
+  awsCognitoUserId_not_lt: UUID
+  awsCognitoUserId_lte: UUID
+  awsCognitoUserId_not_lte: UUID
+  email: String
+  email_not: String
+  email_contains: String
+  email_not_contains: String
+  email_starts_with: String
+  email_not_starts_with: String
+  email_ends_with: String
+  email_not_ends_with: String
+  email_in: [String!]
+  email_not_in: [String!]
+  phoneNumber: String
+  phoneNumber_not: String
+  phoneNumber_contains: String
+  phoneNumber_not_contains: String
+  phoneNumber_starts_with: String
+  phoneNumber_not_starts_with: String
+  phoneNumber_ends_with: String
+  phoneNumber_not_ends_with: String
+  phoneNumber_in: [String!]
+  phoneNumber_not_in: [String!]
+  name: String
+  name_not: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  name_in: [String!]
+  name_not_in: [String!]
+  companyName: String
+  companyName_not: String
+  companyName_contains: String
+  companyName_not_contains: String
+  companyName_starts_with: String
+  companyName_not_starts_with: String
+  companyName_ends_with: String
+  companyName_not_ends_with: String
+  companyName_in: [String!]
+  companyName_not_in: [String!]
+  companyType: String
+  companyType_not: String
+  companyType_contains: String
+  companyType_not_contains: String
+  companyType_starts_with: String
+  companyType_not_starts_with: String
+  companyType_ends_with: String
+  companyType_not_ends_with: String
+  companyType_in: [String!]
+  companyType_not_in: [String!]
+  address: String
+  address_not: String
+  address_contains: String
+  address_not_contains: String
+  address_starts_with: String
+  address_not_starts_with: String
+  address_ends_with: String
+  address_not_ends_with: String
+  address_in: [String!]
+  address_not_in: [String!]
+  generalInfo: GeneralCompanyInfoDbObjectFilter
+  staff_some: ObjectIdFilter
+  staff_none: ObjectIdFilter
+  staff_all: ObjectIdFilter
+  staff_any: Boolean
+  companiesMemberOf_some: ObjectIdFilter
+  companiesMemberOf_none: ObjectIdFilter
+  companiesMemberOf_all: ObjectIdFilter
+  companiesMemberOf_any: Boolean
+  createdDate: DateTime
+  createdDate_not: DateTime
+  createdDate_in: [DateTime!]
+  createdDate_not_in: [DateTime!]
+  createdDate_gt: DateTime
+  createdDate_not_gt: DateTime
+  createdDate_gte: DateTime
+  createdDate_not_gte: DateTime
+  createdDate_lt: DateTime
+  createdDate_not_lt: DateTime
+  createdDate_lte: DateTime
+  createdDate_not_lte: DateTime
+  updatedDate: DateTime
+  updatedDate_not: DateTime
+  updatedDate_in: [DateTime]
+  updatedDate_not_in: [DateTime]
+  updatedDate_gt: DateTime
+  updatedDate_not_gt: DateTime
+  updatedDate_gte: DateTime
+  updatedDate_not_gte: DateTime
+  updatedDate_lt: DateTime
+  updatedDate_not_lt: DateTime
+  updatedDate_lte: DateTime
+  updatedDate_not_lte: DateTime
+  emailVerified: Boolean
+  emailVerified_not: Boolean
+  phoneVerified: Boolean
+  phoneVerified_not: Boolean
+}
+
+input UserDbObjectSort {
+  awsCognitoUserId: SortOperationKind
+  email: SortOperationKind
+  phoneNumber: SortOperationKind
+  name: SortOperationKind
+  companyName: SortOperationKind
+  companyType: SortOperationKind
+  address: SortOperationKind
+  generalInfo: GeneralCompanyInfoDbObjectSort
+  createdDate: SortOperationKind
+  updatedDate: SortOperationKind
+  emailVerified: SortOperationKind
+  phoneVerified: SortOperationKind
 }
 
 enum ApplyPolicy {
@@ -193,10 +475,18 @@ enum HttpStatusCode {
   NETWORK_AUTHENTICATION_REQUIRED
 }
 
+enum SortOperationKind {
+  ASC
+  DESC
+}
+
 "The `DateTime` scalar represents an ISO-8601 compliant date time type."
 scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
 
 "The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
 scalar Long
+
+"The `Short` scalar type represents non-fractional signed whole 16-bit numeric values. Short can represent values between -(2^15) and 2^15 - 1."
+scalar Short
 
 scalar UUID @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc4122")

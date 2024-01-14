@@ -1,4 +1,5 @@
-﻿using Amazon.CognitoIdentityProvider;
+﻿using System.IdentityModel.Tokens.Jwt;
+using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
 using BE.TradeeHub.UserService.Domain.Interfaces;
 using BE.TradeeHub.UserService.Domain.Interfaces.Repositories;
@@ -41,7 +42,7 @@ public class AuthService
         return confirmationResponse;
     }
 
-    public async Task<ResendConfirmationCodeResponse> ResendConfirmationCodeAsync(string email, CancellationToken ctx)
+    public async Task<ResendConfirmationCodeResponse> ResendVerificationCodeAsync(string email, CancellationToken ctx)
     {
         var request = new ResendConfirmationCodeRequest
         {
@@ -147,6 +148,7 @@ public class AuthService
         var user = new UserDbObject
         {
             Email = request.Email,
+            AwsCognitoUserId = new Guid(response.UserSub),
             PhoneNumber = request.PhoneNumber,
             Name = request.Name,
             CompanyName = request.CompanyName,
@@ -167,7 +169,7 @@ public class AuthService
         return response;
     }
     
-    public async Task<TokenResponse> LoginAsync(LoginRequest request)
+    public async Task<AuthenticatedUserResponse?> LoginAsync(LoginRequest request, CancellationToken ctx)
     {
         var authRequest = new InitiateAuthRequest
         {
@@ -180,13 +182,56 @@ public class AuthService
             }
         };
 
-        var authResponse = await _cognitoService.InitiateAuthAsync(authRequest);
+        var authResponse = await _cognitoService.InitiateAuthAsync(authRequest, ctx);
+
+        if (authResponse.HttpStatusCode != System.Net.HttpStatusCode.OK) return null;
         
-        return new TokenResponse
+        var idToken = authResponse.AuthenticationResult?.IdToken;
+        
+        if (string.IsNullOrEmpty(idToken)) return null;
+            
+        var handler = new JwtSecurityTokenHandler();
+        var jsonToken = handler.ReadToken(idToken) as JwtSecurityToken;
+        var userIdString = jsonToken?.Claims.FirstOrDefault(claim => claim.Type == "sub")?.Value;
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId)) return null;
+        
+        var user = await _userRepository.GetCustomerByAwsId(userId, ctx);
+        
+        if (user == null) return null;
+
+        return new AuthenticatedUserResponse
         {
-            IdToken = authResponse.AuthenticationResult.IdToken,
-            AccessToken = authResponse.AuthenticationResult.AccessToken,
-            RefreshToken = authResponse.AuthenticationResult.RefreshToken
+            AuthResponse = authResponse,
+            User = user
         };
     }
+
+    public DateTime? GetExpiryDateFromJwt(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        
+        if (!handler.CanReadToken(token))
+        {
+            return null;
+        }
+
+        try
+        {
+            var jwtToken = handler.ReadJwtToken(token);
+            var expClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "exp");
+            if (expClaim != null && long.TryParse(expClaim.Value, out var exp))
+            {
+                return DateTimeOffset.FromUnixTimeSeconds(exp).UtcDateTime;
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle or log exception
+            // This can happen if the token format is incorrect
+        }
+
+        return null;
+    }
+
 }

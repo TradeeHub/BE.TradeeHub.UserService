@@ -19,6 +19,14 @@ public class UserRepository
         return user;
     }
     
+    public async Task<UserDbObject?> GetCustomerByAwsId(Guid awsUserId, CancellationToken ctx)
+    {
+        var filter = Builders<UserDbObject>.Filter.Eq(user => user.AwsCognitoUserId, awsUserId);
+
+        return await _dbContext.Users.Find(filter).FirstOrDefaultAsync(ctx);
+    }
+
+    
     public async Task<IEnumerable<UserDbObject>?> GetStaffByIds(IEnumerable<ObjectId> staffIds, CancellationToken ctx)
     {
         // The filter should be on the Customers field, not the Id field
