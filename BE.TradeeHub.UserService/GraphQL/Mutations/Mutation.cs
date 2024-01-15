@@ -42,27 +42,28 @@ public class Mutation
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Secure = false, // Set to false if not using HTTPS need to change it later to true when we use https
-                SameSite = SameSiteMode.Strict,
-                Expires = expirationTime
+                Secure = false, // Remember to change to true when using HTTPS
+                SameSite = SameSiteMode.Unspecified, // Change to None when using Secure=true
+                Expires = expirationTime,
+                // Domain = "localhost", // Set the domain to localhost
+                Path = "/" // Make the cookie available across the entire domain
             };
-
             // Set the IdToken as a cookie
             httpContextAccessor.HttpContext.Response.Cookies.Append("jwt", idToken, cookieOptions);
 
             var refreshTokenExpiry = authService.GetExpiryDateFromJwt(refreshToken);
-
+            
             var refreshTokenCookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Secure = false, // Set to false if not using HTTPS need to change it later to true when we use https
-                SameSite = SameSiteMode.Strict,
-                Expires = refreshTokenExpiry
+                Secure = false, // Remember to change to true when using HTTPS
+                SameSite = SameSiteMode.Unspecified, // Change to None when using Secure=true
+                Expires = DateTime.UtcNow.AddDays(30),
+                // Domain = "localhost", // Set the domain to localhost
+                Path = "/" // Make the cookie available across the entire domain
             };
-
-            // Set the RefreshToken as a cookie or store it in your chosen location
-            httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", refreshToken,
-                refreshTokenCookieOptions);
+       
+            httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", refreshToken, refreshTokenCookieOptions);
 
             return new LoginResponse()
             {

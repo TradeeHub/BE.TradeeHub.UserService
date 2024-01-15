@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using BE.TradeeHub.UserService.Infrastructure.DbObjects;
 using BE.TradeeHub.UserService.Requests;
+using HotChocolate.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Execution;
 using MongoDB.Driver;
@@ -17,5 +18,11 @@ public class Query
     {
         var collect = collection.AsExecutable();
         return collect;
+    }
+    
+    [Authorize]
+    public IExecutable<UserDbObject> GetUserByAwsCognitoId([Service] IMongoCollection<UserDbObject> collection, Guid Id, CancellationToken ctx)
+    {
+        return collection.Find(x => x.AwsCognitoUserId == Id).AsExecutable();
     }
 }
