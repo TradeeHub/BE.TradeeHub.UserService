@@ -25,4 +25,11 @@ public class Query
     {
         return collection.Find(x => x.AwsCognitoUserId == Id).AsExecutable();
     }
+    
+    [Authorize]
+    [UseFirstOrDefault]
+    public IExecutable<UserDbObject> GetLoggedInUser([Service] IMongoCollection<UserDbObject> collection, [Service] UserContext userContext, CancellationToken ctx)
+    {
+        return collection.Find(x => x.AwsCognitoUserId == userContext.UserId).AsExecutable();
+    }
 }

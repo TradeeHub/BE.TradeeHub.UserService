@@ -43,9 +43,8 @@ public class Mutation
             {
                 HttpOnly = true,
                 Secure = false, // Remember to change to true when using HTTPS
-                SameSite = SameSiteMode.Unspecified, // Change to None when using Secure=true
+                SameSite = SameSiteMode.Strict, // Change to None when using Secure=true
                 Expires = expirationTime,
-                // Domain = "localhost", // Set the domain to localhost
                 Path = "/" // Make the cookie available across the entire domain
             };
             // Set the IdToken as a cookie
@@ -57,9 +56,8 @@ public class Mutation
             {
                 HttpOnly = true,
                 Secure = false, // Remember to change to true when using HTTPS
-                SameSite = SameSiteMode.Unspecified, // Change to None when using Secure=true
+                SameSite = SameSiteMode.Strict, // Change to None when using Secure=true
                 Expires = DateTime.UtcNow.AddDays(30),
-                // Domain = "localhost", // Set the domain to localhost
                 Path = "/" // Make the cookie available across the entire domain
             };
        

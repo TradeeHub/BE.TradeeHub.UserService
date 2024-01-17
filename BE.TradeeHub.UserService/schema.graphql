@@ -65,6 +65,7 @@ type PageInfo {
 type Query {
   users("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String order_by: UserDbObjectSort where: UserDbObjectFilter): UsersConnection
   userByAwsCognitoId(id: UUID!): [UserDbObject!]! @authorize
+  loggedInUser: UserDbObject @authorize
 }
 
 type ResendConfirmationCodeResponse {

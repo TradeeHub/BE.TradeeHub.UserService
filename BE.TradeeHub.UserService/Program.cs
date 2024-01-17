@@ -21,6 +21,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var appSettings = new AppSettings(builder.Configuration);
 builder.Services.AddSingleton<IAppSettings>(appSettings);
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddCors(options =>
 {
@@ -42,7 +43,7 @@ builder.Services.AddScoped<CompaniesMemberOfDataLoader>();
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<TypeResolver>();
-builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<UserContext>(); // Add UserContext as a scoped service
 
 builder.Services.AddSingleton<IMongoCollection<UserDbObject>>(serviceProvider =>
 {
