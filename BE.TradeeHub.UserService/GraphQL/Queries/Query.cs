@@ -1,9 +1,6 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using BE.TradeeHub.UserService.Infrastructure.DbObjects;
-using BE.TradeeHub.UserService.Requests;
+﻿using BE.TradeeHub.UserService.Infrastructure.DbObjects;
 using HotChocolate.Authorization;
 using HotChocolate.Data;
-using HotChocolate.Execution;
 using MongoDB.Driver;
 
 namespace BE.TradeeHub.UserService.GraphQL.Queries;
@@ -23,13 +20,19 @@ public class Query
     [Authorize]
     public IExecutable<UserDbObject> GetUserByAwsCognitoId([Service] IMongoCollection<UserDbObject> collection, Guid Id, CancellationToken ctx)
     {
-        return collection.Find(x => x.AwsCognitoUserId == Id).AsExecutable();
+        return collection.Find(x => x.Id == Id).AsExecutable();
     }
     
     [Authorize]
     [UseFirstOrDefault]
-    public IExecutable<UserDbObject> GetLoggedInUser([Service] IMongoCollection<UserDbObject> collection, [Service] UserContext userContext, CancellationToken ctx)
+    public UserDbObject GetLoggedInUser([Service] IMongoCollection<UserDbObject> collection, [Service] UserContext userContext)
     {
-        return collection.Find(x => x.AwsCognitoUserId == userContext.UserId).AsExecutable();
+        return new UserDbObject()
+        {
+            Id = userContext.UserId,
+            Name = userContext.Name,
+            CompanyName = userContext.CompanyName,
+            Email = userContext.Email
+        };
     }
 }

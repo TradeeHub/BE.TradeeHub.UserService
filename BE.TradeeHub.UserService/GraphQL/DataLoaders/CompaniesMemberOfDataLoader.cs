@@ -4,7 +4,7 @@ using MongoDB.Bson;
 
 namespace BE.TradeeHub.UserService.GraphQL.DataLoaders;
 
-public class CompaniesMemberOfDataLoader : GroupedDataLoader<ObjectId, UserDbObject>
+public class CompaniesMemberOfDataLoader : GroupedDataLoader<Guid, UserDbObject>
 {
     private readonly UserRepository _userRepository;
 
@@ -14,7 +14,7 @@ public class CompaniesMemberOfDataLoader : GroupedDataLoader<ObjectId, UserDbObj
         _userRepository = userRepository;
     }
 
-    protected override async Task<ILookup<ObjectId, UserDbObject>> LoadGroupedBatchAsync(IReadOnlyList<ObjectId> staffIds, CancellationToken cancellationToken)
+    protected override async Task<ILookup<Guid, UserDbObject>> LoadGroupedBatchAsync(IReadOnlyList<Guid> staffIds, CancellationToken cancellationToken)
     {
         var companies = await _userRepository.GetStaffByIds(staffIds, cancellationToken); //returns companies where the staff belongs to
 

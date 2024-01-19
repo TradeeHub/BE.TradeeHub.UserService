@@ -1,10 +1,9 @@
 ﻿using BE.TradeeHub.UserService.Infrastructure.DbObjects;
 using BE.TradeeHub.UserService.Infrastructure.Repository;
-using MongoDB.Bson;
 
 namespace BE.TradeeHub.UserService.GraphQL.DataLoaders;
 
-public class StaffDataLoader : GroupedDataLoader<ObjectId, UserDbObject>
+public class StaffDataLoader : GroupedDataLoader<Guid, UserDbObject>
 {
     private readonly UserRepository _userRepository;
 
@@ -14,7 +13,7 @@ public class StaffDataLoader : GroupedDataLoader<ObjectId, UserDbObject>
         _userRepository = userRepository;
     }
 
-    protected override async Task<ILookup<ObjectId, UserDbObject>> LoadGroupedBatchAsync(IReadOnlyList<ObjectId> companiesMemberOfIds, CancellationToken cancellationToken)
+    protected override async Task<ILookup<Guid, UserDbObject>> LoadGroupedBatchAsync(IReadOnlyList<Guid> companiesMemberOfIds, CancellationToken cancellationToken)
     {
         // so basically we need to check the the children to what company they belong to that's why we use the GetAccessToCompaniesByIds 
         // because I am already on the staff level and I need to access my parent company 

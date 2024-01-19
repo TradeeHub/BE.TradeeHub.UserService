@@ -12,22 +12,15 @@ public class UserRepository
     {
         _dbContext = dbContext;
     }
-    public async Task<UserDbObject> GetCustomerById(ObjectId userId)
-    {
-        var filter = Builders<UserDbObject>.Filter.Eq(c => c.Id, userId);
-        var user =  await _dbContext.Users.Find(filter).FirstOrDefaultAsync();
-        return user;
-    }
     
-    public async Task<UserDbObject?> GetCustomerByAwsId(Guid awsUserId, CancellationToken ctx)
+    public async Task<UserDbObject?> GetCustomerById(Guid awsUserId, CancellationToken ctx)
     {
-        var filter = Builders<UserDbObject>.Filter.Eq(user => user.AwsCognitoUserId, awsUserId);
+        var filter = Builders<UserDbObject>.Filter.Eq(user => user.Id, awsUserId);
 
         return await _dbContext.Users.Find(filter).FirstOrDefaultAsync(ctx);
     }
-
     
-    public async Task<IEnumerable<UserDbObject>?> GetStaffByIds(IEnumerable<ObjectId> staffIds, CancellationToken ctx)
+    public async Task<IEnumerable<UserDbObject>?> GetStaffByIds(IEnumerable<Guid> staffIds, CancellationToken ctx)
     {
         // The filter should be on the Customers field, not the Id field
         var filter = Builders<UserDbObject>.Filter.AnyIn(p => p.Staff, staffIds);
@@ -37,7 +30,7 @@ public class UserRepository
         return staff; 
     }
     
-    public async Task<IEnumerable<UserDbObject>?> GetCompaniesMemberOfByIds(IEnumerable<ObjectId> companyIds, CancellationToken ctx)
+    public async Task<IEnumerable<UserDbObject>?> GetCompaniesMemberOfByIds(IEnumerable<Guid> companyIds, CancellationToken ctx)
     {
         // The filter should be on the Customers field, not the Id field
         var filter = Builders<UserDbObject>.Filter.AnyIn(p => p.CompaniesMemberOf, companyIds);

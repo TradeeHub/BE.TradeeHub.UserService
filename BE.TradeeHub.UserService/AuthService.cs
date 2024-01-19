@@ -147,8 +147,8 @@ public class AuthService
         
         var user = new UserDbObject
         {
+            Id = new Guid(response.UserSub),
             Email = request.Email,
-            AwsCognitoUserId = new Guid(response.UserSub),
             PhoneNumber = request.PhoneNumber,
             Name = request.Name,
             CompanyName = request.CompanyName,
@@ -196,7 +196,7 @@ public class AuthService
 
         if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId)) return null;
         
-        var user = await _userRepository.GetCustomerByAwsId(userId, ctx);
+        var user = await _userRepository.GetCustomerById(userId, ctx);
         
         if (user == null) return null;
 

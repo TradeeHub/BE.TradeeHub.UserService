@@ -25,6 +25,6 @@ public class UserContext
     }
 
     public string Name => _httpContextAccessor.HttpContext?.User?.FindFirst("name")?.Value ?? throw new Exception("Name claim not found.");
-
     public string Email => _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value ?? throw new Exception("Email claim not found.");
+    public string CompanyName => _httpContextAccessor.HttpContext?.User?.FindFirst("custom:company_name")?.Value ?? throw new Exception("Company name claim not found.");
 }

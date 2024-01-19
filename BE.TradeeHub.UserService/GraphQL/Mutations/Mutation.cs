@@ -51,16 +51,16 @@ public class Mutation
             httpContextAccessor.HttpContext.Response.Cookies.Append("jwt", idToken, cookieOptions);
 
             var refreshTokenExpiry = authService.GetExpiryDateFromJwt(refreshToken);
-            
+
             var refreshTokenCookieOptions = new CookieOptions
             {
                 HttpOnly = true,
                 Secure = false, // Remember to change to true when using HTTPS
                 SameSite = SameSiteMode.Strict, // Change to None when using Secure=true
-                Expires = DateTime.UtcNow.AddDays(30),
+                Expires = refreshTokenExpiry,
                 Path = "/" // Make the cookie available across the entire domain
             };
-       
+
             httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", refreshToken, refreshTokenCookieOptions);
 
             return new LoginResponse()
@@ -110,11 +110,20 @@ public class Mutation
         {
             var response = await authService.ConfirmRegistrationAsync(confirmationCode, email, ctx);
 
-            return new AccountConfirmationResponse()
+            return response.HttpStatusCode switch
             {
-                ConfirmSignUpResponse = response,
-                IsConfirmationSuccess = true,
-                Message = "Account successfully confirmed."
+                System.Net.HttpStatusCode.OK => new AccountConfirmationResponse()
+                {
+                    ConfirmSignUpResponse = response,
+                    IsConfirmationSuccess = true,
+                    Message = "Account successfully confirmed."
+                },
+                _ => new AccountConfirmationResponse()
+                {
+                    ConfirmSignUpResponse = response,
+                    IsConfirmationSuccess = false,
+                    Message = "Invalid verification code provided, please try again."
+                }
             };
         }
         catch (ExpiredCodeException ex)
@@ -142,5 +151,35 @@ public class Mutation
         {
             throw new QueryException(ex.Message);
         }
+    }
+
+    public LogoutResponse Logout([Service] IHttpContextAccessor httpContextAccessor)
+    {
+        if (httpContextAccessor.HttpContext == null)
+        {
+            return new LogoutResponse() { Success = false, Message = "Failed to access HTTP context." };
+        }
+
+        // Overwrite and expire the JWT cookie
+        httpContextAccessor.HttpContext.Response.Cookies.Append("jwt", "", new CookieOptions
+        {
+            Expires = DateTime.UtcNow.AddDays(-1),
+            HttpOnly = true,
+            Secure = false, // Remember to change to true when using HTTPS
+            SameSite = SameSiteMode.Strict, // Change to None when using Secure=true
+            Path = "/"
+        });
+
+        // Overwrite and expire the refreshToken cookie
+        httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", "", new CookieOptions
+        {
+            Expires = DateTime.UtcNow.AddDays(-1),
+            HttpOnly = true,
+            Secure = false, // Remember to change to true when using HTTPS
+            SameSite = SameSiteMode.Strict, // Change to None when using Secure=true
+            Path = "/"
+        });
+        
+        return new LogoutResponse() { Success = true, Message = "Logout Successful." };
     }
 }
