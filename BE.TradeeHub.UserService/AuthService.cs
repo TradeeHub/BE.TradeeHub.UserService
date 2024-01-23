@@ -15,14 +15,17 @@ public class AuthService
     private readonly IAmazonCognitoIdentityProvider _cognitoService;
     private readonly IAppSettings _appSettings;
     private readonly UserRepository _userRepository;
-    public AuthService(IAmazonCognitoIdentityProvider cognitoService, IAppSettings appSettings, UserRepository userRepository)
+
+    public AuthService(IAmazonCognitoIdentityProvider cognitoService, IAppSettings appSettings,
+        UserRepository userRepository)
     {
         _cognitoService = cognitoService;
         _appSettings = appSettings;
         _userRepository = userRepository;
     }
 
-    public async Task<ConfirmSignUpResponse> ConfirmRegistrationAsync(string confirmationCode, string email, CancellationToken ctx)
+    public async Task<ConfirmSignUpResponse> ConfirmRegistrationAsync(string confirmationCode, string email,
+        CancellationToken ctx)
     {
         var request = new ConfirmSignUpRequest
         {
@@ -31,8 +34,8 @@ public class AuthService
             ConfirmationCode = confirmationCode
         };
 
-        var confirmationResponse =  await _cognitoService.ConfirmSignUpAsync(request, ctx);
-        
+        var confirmationResponse = await _cognitoService.ConfirmSignUpAsync(request, ctx);
+
         if (confirmationResponse.HttpStatusCode == System.Net.HttpStatusCode.OK)
         {
             // If the confirmation is successful, update the user in MongoDB
@@ -49,38 +52,56 @@ public class AuthService
             ClientId = _appSettings.AppClientId,
             Username = email
         };
-        
+
         var response = await _cognitoService.ResendConfirmationCodeAsync(request, ctx);
 
         return response;
     }
-    
-        public async Task<UserDbObject> AddRandomUser(RegisterRequest request, CancellationToken ctx)
+
+    public async Task<UserDbObject> AddRandomUser(RegisterRequest request, CancellationToken ctx)
     {
-        
         var user = new UserDbObject
         {
             Email = request.Email,
-            PhoneNumber = request.PhoneNumber,
             Name = request.Name,
+            PhoneNumber = request.PhoneNumber,
+            Place = new PlaceDbObject()
+            {
+                PlaceId = request.Place.PlaceId,
+                Address = request.Place.Address,
+                Location = new LocationDbObject()
+                {
+                    Lat = request.Place.Location.Lat,
+                    Lng = request.Place.Location.Lng
+                },
+                Viewport = new ViewPortDbObject()
+                {
+                    Northeast = new LocationDbObject()
+                    {
+                        Lat = request.Place.Viewport.Northeast.Lat,
+                        Lng = request.Place.Viewport.Northeast.Lng
+                    },
+                    Southwest = new LocationDbObject()
+                    {
+                        Lat = request.Place.Viewport.Southwest.Lat,
+                        Lng = request.Place.Viewport.Southwest.Lng
+                    }
+                }
+            },
             CompanyName = request.CompanyName,
             CompanyType = request.CompanyType,
-            Address = request.Address,
-            GeneralInfo = new GeneralCompanyInfoDbObject
-            {
-                MarketingPreference = request.MarketingPreference,
-                AnnualRevenue = request.AnnualRevenue,
-                CompanyPriority = request.CompanyPriority,
-                CompanySize = request.CompanySize
-            },
+            CompanySize = request.CompanySize,
+            ReferralSource = request.ReferralSource,
+            CompanyPriority = request.CompanyPriority,
+            MarketingPreference = request.MarketingPreference,
             CreatedDate = DateTime.UtcNow,
         };
 
         await _userRepository.AddUserAsync(user, ctx);
 
         return user;
-    } 
-    
+    }
+
     public async Task<SignUpResponse> RegisterAsync(RegisterRequest request, CancellationToken ctx)
     {
         var signUpRequest = new SignUpRequest
@@ -102,8 +123,8 @@ public class AuthService
                 },
                 new AttributeType
                 {
-                    Name = "custom:annual_revenue",
-                    Value = request.AnnualRevenue
+                    Name = "custom:referral_source",
+                    Value = request.ReferralSource
                 },
                 new AttributeType
                 {
@@ -123,13 +144,13 @@ public class AuthService
                 new AttributeType
                 {
                     Name = "custom:marketing_preference",
-                    Value = request.MarketingPreference
+                    Value = request.MarketingPreference.ToString()
                 },
                 // The 'address' attribute seems to be a required, not custom attribute, and should not have the 'custom:' prefix
                 new AttributeType
                 {
                     Name = "address",
-                    Value = request.Address
+                    Value = request.Place.Address
                 },
                 // The 'phone_number' attribute is also a standard attribute and should be named as 'phone_number', not 'phone'
                 new AttributeType
@@ -144,23 +165,41 @@ public class AuthService
         var response = await _cognitoService.SignUpAsync(signUpRequest, ctx);
 
         if (response.HttpStatusCode != System.Net.HttpStatusCode.OK) return response;
-        
+
         var user = new UserDbObject
         {
-            Id = new Guid(response.UserSub),
             Email = request.Email,
-            PhoneNumber = request.PhoneNumber,
             Name = request.Name,
+            PhoneNumber = request.PhoneNumber,
+            Place = new PlaceDbObject()
+            {
+                PlaceId = request.Place.PlaceId,
+                Address = request.Place.Address,
+                Location = new LocationDbObject()
+                {
+                    Lat = request.Place.Location.Lat,
+                    Lng = request.Place.Location.Lng
+                },
+                Viewport = new ViewPortDbObject()
+                {
+                    Northeast = new LocationDbObject()
+                    {
+                        Lat = request.Place.Viewport.Northeast.Lat,
+                        Lng = request.Place.Viewport.Northeast.Lng
+                    },
+                    Southwest = new LocationDbObject()
+                    {
+                        Lat = request.Place.Viewport.Southwest.Lat,
+                        Lng = request.Place.Viewport.Southwest.Lng
+                    }
+                }
+            },
             CompanyName = request.CompanyName,
             CompanyType = request.CompanyType,
-            Address = request.Address,
-            GeneralInfo = new GeneralCompanyInfoDbObject
-            {
-                MarketingPreference = request.MarketingPreference,
-                AnnualRevenue = request.AnnualRevenue,
-                CompanyPriority = request.CompanyPriority,
-                CompanySize = request.CompanySize
-            },
+            CompanySize = request.CompanySize,
+            ReferralSource = request.ReferralSource,
+            CompanyPriority = request.CompanyPriority,
+            MarketingPreference = request.MarketingPreference,
             CreatedDate = DateTime.UtcNow,
         };
 
@@ -168,7 +207,7 @@ public class AuthService
 
         return response;
     }
-    
+
     public async Task<AuthenticatedUserResponse?> LoginAsync(LoginRequest request, CancellationToken ctx)
     {
         var authRequest = new InitiateAuthRequest
@@ -185,19 +224,19 @@ public class AuthService
         var authResponse = await _cognitoService.InitiateAuthAsync(authRequest, ctx);
 
         if (authResponse.HttpStatusCode != System.Net.HttpStatusCode.OK) return null;
-        
+
         var idToken = authResponse.AuthenticationResult?.IdToken;
-        
+
         if (string.IsNullOrEmpty(idToken)) return null;
-            
+
         var handler = new JwtSecurityTokenHandler();
         var jsonToken = handler.ReadToken(idToken) as JwtSecurityToken;
         var userIdString = jsonToken?.Claims.FirstOrDefault(claim => claim.Type == "sub")?.Value;
 
         if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId)) return null;
-        
+
         var user = await _userRepository.GetCustomerById(userId, ctx);
-        
+
         if (user == null) return null;
 
         return new AuthenticatedUserResponse
@@ -210,7 +249,7 @@ public class AuthService
     public DateTime? GetExpiryDateFromJwt(string token)
     {
         var handler = new JwtSecurityTokenHandler();
-        
+
         if (!handler.CanReadToken(token))
         {
             return null;
@@ -233,5 +272,4 @@ public class AuthService
 
         return null;
     }
-
 }

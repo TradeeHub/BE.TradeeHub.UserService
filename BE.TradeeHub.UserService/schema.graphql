@@ -25,16 +25,14 @@ type DeliveryMediumType {
   value: String
 }
 
-type GeneralCompanyInfoDbObject {
-  marketingPreference: String!
-  annualRevenue: String!
-  companyPriority: String!
-  companySize: String!
-}
-
 type KeyValuePairOfStringAndString {
   key: String!
   value: String!
+}
+
+type LocationDbObject {
+  lat: Decimal!
+  lng: Decimal!
 }
 
 type LoginResponse {
@@ -66,6 +64,13 @@ type PageInfo {
   startCursor: String
   "When paginating forwards, the cursor to continue."
   endCursor: String
+}
+
+type PlaceDbObject {
+  placeId: String!
+  address: String!
+  location: LocationDbObject!
+  viewport: ViewPortDbObject!
 }
 
 type Query {
@@ -102,12 +107,15 @@ type UserDbObject {
   companiesMemberOf: [UserDbObject]
   id: UUID!
   email: String!
-  phoneNumber: String!
   name: String!
+  phoneNumber: String!
+  place: PlaceDbObject!
   companyName: String!
   companyType: String!
-  address: String!
-  generalInfo: GeneralCompanyInfoDbObject!
+  companySize: String!
+  referralSource: String!
+  companyPriority: String!
+  marketingPreference: Boolean!
   createdDate: DateTime!
   updatedDate: DateTime
   emailVerified: Boolean!
@@ -132,56 +140,9 @@ type UsersEdge {
   node: UserDbObject!
 }
 
-input GeneralCompanyInfoDbObjectFilter {
-  AND: [GeneralCompanyInfoDbObjectFilter!]
-  OR: [GeneralCompanyInfoDbObjectFilter!]
-  marketingPreference: String
-  marketingPreference_not: String
-  marketingPreference_contains: String
-  marketingPreference_not_contains: String
-  marketingPreference_starts_with: String
-  marketingPreference_not_starts_with: String
-  marketingPreference_ends_with: String
-  marketingPreference_not_ends_with: String
-  marketingPreference_in: [String!]
-  marketingPreference_not_in: [String!]
-  annualRevenue: String
-  annualRevenue_not: String
-  annualRevenue_contains: String
-  annualRevenue_not_contains: String
-  annualRevenue_starts_with: String
-  annualRevenue_not_starts_with: String
-  annualRevenue_ends_with: String
-  annualRevenue_not_ends_with: String
-  annualRevenue_in: [String!]
-  annualRevenue_not_in: [String!]
-  companyPriority: String
-  companyPriority_not: String
-  companyPriority_contains: String
-  companyPriority_not_contains: String
-  companyPriority_starts_with: String
-  companyPriority_not_starts_with: String
-  companyPriority_ends_with: String
-  companyPriority_not_ends_with: String
-  companyPriority_in: [String!]
-  companyPriority_not_in: [String!]
-  companySize: String
-  companySize_not: String
-  companySize_contains: String
-  companySize_not_contains: String
-  companySize_starts_with: String
-  companySize_not_starts_with: String
-  companySize_ends_with: String
-  companySize_not_ends_with: String
-  companySize_in: [String!]
-  companySize_not_in: [String!]
-}
-
-input GeneralCompanyInfoDbObjectSort {
-  marketingPreference: SortOperationKind
-  annualRevenue: SortOperationKind
-  companyPriority: SortOperationKind
-  companySize: SortOperationKind
+type ViewPortDbObject {
+  northeast: LocationDbObject!
+  southwest: LocationDbObject!
 }
 
 input ISingleFilterOfGuidFilter {
@@ -201,9 +162,89 @@ input ISingleFilterOfGuidFilter {
   element_not_lte: UUID
 }
 
+input LocationDbObjectFilter {
+  AND: [LocationDbObjectFilter!]
+  OR: [LocationDbObjectFilter!]
+  lat: Decimal
+  lat_not: Decimal
+  lat_in: [Decimal!]
+  lat_not_in: [Decimal!]
+  lat_gt: Decimal
+  lat_not_gt: Decimal
+  lat_gte: Decimal
+  lat_not_gte: Decimal
+  lat_lt: Decimal
+  lat_not_lt: Decimal
+  lat_lte: Decimal
+  lat_not_lte: Decimal
+  lng: Decimal
+  lng_not: Decimal
+  lng_in: [Decimal!]
+  lng_not_in: [Decimal!]
+  lng_gt: Decimal
+  lng_not_gt: Decimal
+  lng_gte: Decimal
+  lng_not_gte: Decimal
+  lng_lt: Decimal
+  lng_not_lt: Decimal
+  lng_lte: Decimal
+  lng_not_lte: Decimal
+}
+
+input LocationDbObjectSort {
+  lat: SortOperationKind
+  lng: SortOperationKind
+}
+
+input LocationRequestInput {
+  lat: Decimal!
+  lng: Decimal!
+}
+
 input LoginRequestInput {
   username: String!
   password: String!
+}
+
+input PlaceDbObjectFilter {
+  AND: [PlaceDbObjectFilter!]
+  OR: [PlaceDbObjectFilter!]
+  placeId: String
+  placeId_not: String
+  placeId_contains: String
+  placeId_not_contains: String
+  placeId_starts_with: String
+  placeId_not_starts_with: String
+  placeId_ends_with: String
+  placeId_not_ends_with: String
+  placeId_in: [String!]
+  placeId_not_in: [String!]
+  address: String
+  address_not: String
+  address_contains: String
+  address_not_contains: String
+  address_starts_with: String
+  address_not_starts_with: String
+  address_ends_with: String
+  address_not_ends_with: String
+  address_in: [String!]
+  address_not_in: [String!]
+  location: LocationDbObjectFilter
+  viewport: ViewPortDbObjectFilter
+}
+
+input PlaceDbObjectSort {
+  placeId: SortOperationKind
+  address: SortOperationKind
+  location: LocationDbObjectSort
+  viewport: ViewPortDbObjectSort
+}
+
+input PlaceRequestInput {
+  placeId: String!
+  address: String!
+  location: LocationRequestInput!
+  viewport: ViewportRequestInput!
 }
 
 input RegisterRequestInput {
@@ -211,13 +252,13 @@ input RegisterRequestInput {
   password: String!
   name: String!
   phoneNumber: String!
-  address: String!
+  place: PlaceRequestInput!
   companyName: String!
-  companyPriority: String!
-  companySize: String!
   companyType: String!
-  marketingPreference: String!
-  annualRevenue: String!
+  companySize: String!
+  referralSource: String!
+  companyPriority: String!
+  marketingPreference: Boolean!
 }
 
 input UserDbObjectFilter {
@@ -245,16 +286,6 @@ input UserDbObjectFilter {
   email_not_ends_with: String
   email_in: [String!]
   email_not_in: [String!]
-  phoneNumber: String
-  phoneNumber_not: String
-  phoneNumber_contains: String
-  phoneNumber_not_contains: String
-  phoneNumber_starts_with: String
-  phoneNumber_not_starts_with: String
-  phoneNumber_ends_with: String
-  phoneNumber_not_ends_with: String
-  phoneNumber_in: [String!]
-  phoneNumber_not_in: [String!]
   name: String
   name_not: String
   name_contains: String
@@ -265,6 +296,17 @@ input UserDbObjectFilter {
   name_not_ends_with: String
   name_in: [String!]
   name_not_in: [String!]
+  phoneNumber: String
+  phoneNumber_not: String
+  phoneNumber_contains: String
+  phoneNumber_not_contains: String
+  phoneNumber_starts_with: String
+  phoneNumber_not_starts_with: String
+  phoneNumber_ends_with: String
+  phoneNumber_not_ends_with: String
+  phoneNumber_in: [String!]
+  phoneNumber_not_in: [String!]
+  place: PlaceDbObjectFilter
   companyName: String
   companyName_not: String
   companyName_contains: String
@@ -285,17 +327,38 @@ input UserDbObjectFilter {
   companyType_not_ends_with: String
   companyType_in: [String!]
   companyType_not_in: [String!]
-  address: String
-  address_not: String
-  address_contains: String
-  address_not_contains: String
-  address_starts_with: String
-  address_not_starts_with: String
-  address_ends_with: String
-  address_not_ends_with: String
-  address_in: [String!]
-  address_not_in: [String!]
-  generalInfo: GeneralCompanyInfoDbObjectFilter
+  companySize: String
+  companySize_not: String
+  companySize_contains: String
+  companySize_not_contains: String
+  companySize_starts_with: String
+  companySize_not_starts_with: String
+  companySize_ends_with: String
+  companySize_not_ends_with: String
+  companySize_in: [String!]
+  companySize_not_in: [String!]
+  referralSource: String
+  referralSource_not: String
+  referralSource_contains: String
+  referralSource_not_contains: String
+  referralSource_starts_with: String
+  referralSource_not_starts_with: String
+  referralSource_ends_with: String
+  referralSource_not_ends_with: String
+  referralSource_in: [String!]
+  referralSource_not_in: [String!]
+  companyPriority: String
+  companyPriority_not: String
+  companyPriority_contains: String
+  companyPriority_not_contains: String
+  companyPriority_starts_with: String
+  companyPriority_not_starts_with: String
+  companyPriority_ends_with: String
+  companyPriority_not_ends_with: String
+  companyPriority_in: [String!]
+  companyPriority_not_in: [String!]
+  marketingPreference: Boolean
+  marketingPreference_not: Boolean
   staff_some: ISingleFilterOfGuidFilter
   staff_none: ISingleFilterOfGuidFilter
   staff_all: ISingleFilterOfGuidFilter
@@ -337,16 +400,36 @@ input UserDbObjectFilter {
 input UserDbObjectSort {
   id: SortOperationKind
   email: SortOperationKind
-  phoneNumber: SortOperationKind
   name: SortOperationKind
+  phoneNumber: SortOperationKind
+  place: PlaceDbObjectSort
   companyName: SortOperationKind
   companyType: SortOperationKind
-  address: SortOperationKind
-  generalInfo: GeneralCompanyInfoDbObjectSort
+  companySize: SortOperationKind
+  referralSource: SortOperationKind
+  companyPriority: SortOperationKind
+  marketingPreference: SortOperationKind
   createdDate: SortOperationKind
   updatedDate: SortOperationKind
   emailVerified: SortOperationKind
   phoneVerified: SortOperationKind
+}
+
+input ViewPortDbObjectFilter {
+  AND: [ViewPortDbObjectFilter!]
+  OR: [ViewPortDbObjectFilter!]
+  northeast: LocationDbObjectFilter
+  southwest: LocationDbObjectFilter
+}
+
+input ViewPortDbObjectSort {
+  northeast: LocationDbObjectSort
+  southwest: LocationDbObjectSort
+}
+
+input ViewportRequestInput {
+  northeast: LocationRequestInput!
+  southwest: LocationRequestInput!
 }
 
 enum ApplyPolicy {
@@ -443,6 +526,9 @@ directive @authorize("The name of the authorization policy that determines acces
 
 "The `DateTime` scalar represents an ISO-8601 compliant date time type."
 scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
+
+"The built-in `Decimal` scalar type."
+scalar Decimal
 
 "The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
 scalar Long
