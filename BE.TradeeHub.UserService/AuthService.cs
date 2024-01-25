@@ -168,6 +168,7 @@ public class AuthService
 
         var user = new UserDbObject
         {
+            Id = Guid.Parse(response.UserSub),
             Email = request.Email,
             Name = request.Name,
             PhoneNumber = request.PhoneNumber,

@@ -48,7 +48,7 @@ public class UserRepository
         }
         catch (Exception e)
         {
-            var error = e.Message;
+            throw new Exception($"Error adding user: {e.Message}");
         }
     }
 
