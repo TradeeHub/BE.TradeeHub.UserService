@@ -15,6 +15,12 @@ type CodeDeliveryDetailsType {
   destination: String
 }
 
+type ConfirmForgotPasswordResponse {
+  responseMetadata: ResponseMetadata
+  contentLength: Long!
+  httpStatusCode: HttpStatusCode!
+}
+
 type ConfirmSignUpResponse {
   responseMetadata: ResponseMetadata
   contentLength: Long!
@@ -23,6 +29,13 @@ type ConfirmSignUpResponse {
 
 type DeliveryMediumType {
   value: String
+}
+
+type ForgotPasswordResponse {
+  codeDeliveryDetails: CodeDeliveryDetailsType
+  responseMetadata: ResponseMetadata
+  contentLength: Long!
+  httpStatusCode: HttpStatusCode!
 }
 
 type KeyValuePairOfStringAndString {
@@ -52,6 +65,8 @@ type Mutation {
   confirmAccount(confirmationCode: String! email: String!): AccountConfirmationResponse!
   resendVerificationCode(email: String!): ResendConfirmationCodeResponse!
   logout: LogoutResponse!
+  forgotPassword(email: String!): ForgotPasswordResponse!
+  changePassword(request: ChangedForgottenPasswordRequestInput!): ConfirmForgotPasswordResponse!
 }
 
 "Information about pagination in a connection."
@@ -143,6 +158,12 @@ type UsersEdge {
 type ViewPortDbObject {
   northeast: LocationDbObject!
   southwest: LocationDbObject!
+}
+
+input ChangedForgottenPasswordRequestInput {
+  resetConfirmationCode: String!
+  email: String!
+  newPassword: String!
 }
 
 input ISingleFilterOfGuidFilter {

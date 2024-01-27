@@ -70,10 +70,11 @@ public class Mutation
                 IsConfirmed = true
             };
         }
-        catch (UserNotConfirmedException)
+        catch (UserNotConfirmedException ex)
         {
             return new LoginResponse()
             {
+                User = null,
                 IsSuccess = true,
                 IsConfirmed = false
             };
@@ -81,20 +82,13 @@ public class Mutation
         catch (NotAuthorizedException ex)
         {
             // This block will catch the NotAuthorizedException, which indicates wrong username or password
-            return new LoginResponse()
-            {
-                IsSuccess = false,
-                IsConfirmed = false,
-            };
+            throw new QueryException(ex.Message);
         }
         catch (UserNotFoundException ex)
         {
             // This block will catch exception when the user does not exist
-            return new LoginResponse()
-            {
-                IsSuccess = false,
-                IsConfirmed = false,
-            };
+            throw new QueryException(ex.Message);
+
         }
         catch (Exception ex)
         {
@@ -181,5 +175,29 @@ public class Mutation
         });
         
         return new LogoutResponse() { Success = true, Message = "Logout Successful." };
+    }
+    
+    public async Task<ForgotPasswordResponse> ForgotPasswordAsync([Service] AuthService authService, string email, CancellationToken ctx)
+    {
+        try
+        {
+            return await authService.ForgotPasswordAsync(email, ctx);
+        }
+        catch (Exception ex)
+        {
+            throw new QueryException(ex.Message);
+        }
+    }
+    
+    public async Task<ConfirmForgotPasswordResponse> ChangePassword([Service] AuthService authService, ChangedForgottenPasswordRequest request, CancellationToken ctx)
+    {
+        try
+        {
+            return await authService.ChangePasswordAsync(request, ctx);
+        }
+        catch (Exception ex)
+        {
+            throw new QueryException(ex.Message);
+        }
     }
 }

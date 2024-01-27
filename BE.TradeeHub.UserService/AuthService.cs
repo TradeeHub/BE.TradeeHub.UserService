@@ -2,7 +2,6 @@
 using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
 using BE.TradeeHub.UserService.Domain.Interfaces;
-using BE.TradeeHub.UserService.Domain.Interfaces.Repositories;
 using BE.TradeeHub.UserService.Infrastructure.DbObjects;
 using BE.TradeeHub.UserService.Infrastructure.Repository;
 using BE.TradeeHub.UserService.Requests;
@@ -267,10 +266,36 @@ public class AuthService
         }
         catch (Exception ex)
         {
-            // Handle or log exception
-            // This can happen if the token format is incorrect
+            throw ex;
         }
 
         return null;
+    }
+
+    public async Task<ForgotPasswordResponse> ForgotPasswordAsync(string email, CancellationToken ctx)
+    {
+        var request = new ForgotPasswordRequest
+        {
+            ClientId = _appSettings.AppClientId,
+            Username = email
+        };
+
+
+        var response = await _cognitoService.ForgotPasswordAsync(request, ctx);
+        return response;
+    }
+    
+    public async Task<ConfirmForgotPasswordResponse> ChangePasswordAsync(ChangedForgottenPasswordRequest request, CancellationToken ctx)
+    {
+        var awsRequest = new ConfirmForgotPasswordRequest
+        {
+            ClientId = _appSettings.AppClientId,
+            Username = request.Email,
+            Password = request.NewPassword,
+            ConfirmationCode = request.ResetConfirmationCode
+        };
+
+        var response = await _cognitoService.ConfirmForgotPasswordAsync(awsRequest, ctx);
+        return response;
     }
 }
