@@ -33,8 +33,9 @@ public class Mutation
 
             var idToken = authResponse.AuthResponse.AuthenticationResult?.IdToken;
             var refreshToken = authResponse.AuthResponse.AuthenticationResult?.RefreshToken;
-            var expiresIn =
-                authResponse.AuthResponse.AuthenticationResult?.ExpiresIn ?? 3600; // Default to 1 hour if null
+            var deviceKey = authResponse.AuthResponse.AuthenticationResult?.NewDeviceMetadata?.DeviceKey;
+
+            var expiresIn = authResponse.AuthResponse.AuthenticationResult?.ExpiresIn ?? 3600; // Default to 1 hour if null
 
             // Calculate the expiration time for the cookies
             var expirationTime = DateTime.UtcNow.AddSeconds(expiresIn);
@@ -49,19 +50,22 @@ public class Mutation
             };
             // Set the IdToken as a cookie
             httpContextAccessor.HttpContext.Response.Cookies.Append("jwt", idToken, cookieOptions);
-
-            var refreshTokenExpiry = authService.GetExpiryDateFromJwt(refreshToken);
-
+            
             var refreshTokenCookieOptions = new CookieOptions
             {
                 HttpOnly = true,
                 Secure = false, // Remember to change to true when using HTTPS
                 SameSite = SameSiteMode.Strict, // Change to None when using Secure=true
-                Expires = refreshTokenExpiry,
+                Expires = DateTime.UtcNow.AddYears(5),
                 Path = "/" // Make the cookie available across the entire domain
             };
 
             httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", refreshToken, refreshTokenCookieOptions);
+            
+            if (request.RememberMe && !string.IsNullOrEmpty(deviceKey))
+            {
+                httpContextAccessor.HttpContext.Response.Cookies.Append("deviceKey", deviceKey, refreshTokenCookieOptions);
+            }
 
             return new LoginResponse()
             {
@@ -166,6 +170,15 @@ public class Mutation
 
         // Overwrite and expire the refreshToken cookie
         httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", "", new CookieOptions
+        {
+            Expires = DateTime.UtcNow.AddDays(-1),
+            HttpOnly = true,
+            Secure = false, // Remember to change to true when using HTTPS
+            SameSite = SameSiteMode.Strict, // Change to None when using Secure=true
+            Path = "/"
+        });
+        
+        httpContextAccessor.HttpContext.Response.Cookies.Append("deviceKey", "", new CookieOptions
         {
             Expires = DateTime.UtcNow.AddDays(-1),
             HttpOnly = true,

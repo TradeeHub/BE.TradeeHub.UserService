@@ -246,32 +246,6 @@ public class AuthService
         };
     }
 
-    public DateTime? GetExpiryDateFromJwt(string token)
-    {
-        var handler = new JwtSecurityTokenHandler();
-
-        if (!handler.CanReadToken(token))
-        {
-            return null;
-        }
-
-        try
-        {
-            var jwtToken = handler.ReadJwtToken(token);
-            var expClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "exp");
-            if (expClaim != null && long.TryParse(expClaim.Value, out var exp))
-            {
-                return DateTimeOffset.FromUnixTimeSeconds(exp).UtcDateTime;
-            }
-        }
-        catch (Exception ex)
-        {
-            throw ex;
-        }
-
-        return null;
-    }
-
     public async Task<ForgotPasswordResponse> ForgotPasswordAsync(string email, CancellationToken ctx)
     {
         var request = new ForgotPasswordRequest
@@ -284,8 +258,9 @@ public class AuthService
         var response = await _cognitoService.ForgotPasswordAsync(request, ctx);
         return response;
     }
-    
-    public async Task<ConfirmForgotPasswordResponse> ChangePasswordAsync(ChangedForgottenPasswordRequest request, CancellationToken ctx)
+
+    public async Task<ConfirmForgotPasswordResponse> ChangePasswordAsync(ChangedForgottenPasswordRequest request,
+        CancellationToken ctx)
     {
         var awsRequest = new ConfirmForgotPasswordRequest
         {
@@ -297,5 +272,126 @@ public class AuthService
 
         var response = await _cognitoService.ConfirmForgotPasswordAsync(awsRequest, ctx);
         return response;
+    }
+
+    public async Task<RefreshJwtResponse> RefreshTokenAsync(IHttpContextAccessor httpContextAccessor, CancellationToken cancellationToken)
+    {
+        try
+        {
+            // var jwtCookieValue = httpContextAccessor.HttpContext.Request.Cookies["jwt"];
+            var refreshToken = httpContextAccessor.HttpContext.Request.Cookies["refreshToken"];
+            var deviceKey = httpContextAccessor.HttpContext.Request.Cookies["deviceKey"];
+
+            if (string.IsNullOrEmpty(refreshToken)) return new RefreshJwtResponse() { Success = false, Message = "No refresh token found." };
+            
+            var tokenRequest = new InitiateAuthRequest
+            {
+                ClientId = _appSettings.AppClientId,
+                AuthFlow = AuthFlowType.REFRESH_TOKEN_AUTH,
+                AuthParameters = new Dictionary<string, string>
+                {
+                    { "REFRESH_TOKEN", refreshToken }
+                }
+            };
+
+            if (!string.IsNullOrEmpty(deviceKey))
+            {
+                tokenRequest.AuthParameters.Add("DEVICE_KEY", deviceKey);
+            }
+
+            var authResponse = await _cognitoService.InitiateAuthAsync(tokenRequest, cancellationToken);
+            
+            if (authResponse.HttpStatusCode != System.Net.HttpStatusCode.OK) return new RefreshJwtResponse() { Success = false, Message = "Invalid Refresh Token" };;
+            
+            var newJwtToken = authResponse.AuthenticationResult.IdToken;
+            var jwtExpiresIn = authResponse.AuthenticationResult.ExpiresIn;
+            var jwtExpirationTime = DateTime.UtcNow.AddSeconds(jwtExpiresIn);
+
+            var jwtCookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false, // Change to true when using HTTPS
+                SameSite = SameSiteMode.Strict, // Change to None when using Secure=true
+                Expires = jwtExpirationTime,
+                Path = "/" // Make the cookie available across the entire domain
+            };
+
+            httpContextAccessor.HttpContext.Response.Cookies.Append("jwt", newJwtToken, jwtCookieOptions);
+            
+            return new RefreshJwtResponse
+            {
+                Success = true,
+                AuthResponse = authResponse,
+                Message = "Successfully refreshed JWT token."
+            };
+        }
+        catch (Exception ex)
+        {
+            // Log the exception details
+            Console.WriteLine(ex.Message);
+            throw; // Rethrow the exception to handle it outside this method
+        }
+    }
+
+    public async Task<string> RefreshTokenAsync(HttpContext httpContext, string refreshToken,
+        CancellationToken cancellationToken, string? deviceKey = null)
+    {
+        try
+        {
+            var jwt = "";
+            var tokenRequest = new InitiateAuthRequest
+            {
+                ClientId = _appSettings.AppClientId,
+                AuthFlow = AuthFlowType.REFRESH_TOKEN_AUTH,
+                AuthParameters = new Dictionary<string, string>
+                {
+                    { "REFRESH_TOKEN", refreshToken }
+                }
+            };
+
+            if (!string.IsNullOrEmpty(deviceKey))
+            {
+                tokenRequest.AuthParameters.Add("DEVICE_KEY", deviceKey);
+            }
+
+            var authResponse = await _cognitoService.InitiateAuthAsync(tokenRequest, cancellationToken);
+
+            if (authResponse.HttpStatusCode != System.Net.HttpStatusCode.OK ||
+                authResponse.AuthenticationResult == null)
+                throw new Exception("Failed to refresh token");
+
+            // Check if response has already started
+            if (!httpContext.Response.HasStarted)
+            {
+                var newJwtToken = authResponse.AuthenticationResult.IdToken;
+                var jwtExpiresIn = authResponse.AuthenticationResult.ExpiresIn;
+                var jwtExpirationTime = DateTime.UtcNow.AddSeconds(jwtExpiresIn);
+
+                var jwtCookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = false, // Change to true when using HTTPS
+                    SameSite = SameSiteMode.Strict, // Change to None when using Secure=true
+                    Expires = jwtExpirationTime,
+                    Path = "/" // Make the cookie available across the entire domain
+                };
+
+                httpContext.Response.Cookies.Append("jwt", newJwtToken, jwtCookieOptions);
+                
+                jwt = newJwtToken;
+            }
+            else
+            {
+                // Log or handle the case where the response has already started
+                Console.WriteLine("Response has already started, cannot set cookie.");
+            }
+
+            return jwt;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            throw;
+        }
     }
 }

@@ -225,6 +225,7 @@ input LocationRequestInput {
 input LoginRequestInput {
   username: String!
   password: String!
+  rememberMe: Boolean!
 }
 
 input PlaceDbObjectFilter {

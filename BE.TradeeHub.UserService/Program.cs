@@ -44,7 +44,6 @@ builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<TypeResolver>();
 builder.Services.AddScoped<UserContext>(); // Add UserContext as a scoped service
-
 builder.Services.AddSingleton<IMongoCollection<UserDbObject>>(serviceProvider =>
 {
     var mongoDbContext = serviceProvider.GetRequiredService<MongoDbContext>();
@@ -138,6 +137,7 @@ if (appSettings.Environment is "Development" or "Docker")
 app.UseCors("GraphQLCorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.UseRouting();
 app.MapGraphQL();
 
@@ -154,3 +154,4 @@ app.Use(async (context, next) =>
 });
 
 app.Run();
+
