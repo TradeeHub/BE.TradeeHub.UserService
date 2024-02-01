@@ -84,6 +84,9 @@ type PageInfo {
 type PlaceDbObject {
   placeId: String!
   address: String!
+  country: String!
+  countryCode: String!
+  callingCode: String!
   location: LocationDbObject!
   viewport: ViewPortDbObject!
 }
@@ -251,6 +254,36 @@ input PlaceDbObjectFilter {
   address_not_ends_with: String
   address_in: [String!]
   address_not_in: [String!]
+  country: String
+  country_not: String
+  country_contains: String
+  country_not_contains: String
+  country_starts_with: String
+  country_not_starts_with: String
+  country_ends_with: String
+  country_not_ends_with: String
+  country_in: [String!]
+  country_not_in: [String!]
+  countryCode: String
+  countryCode_not: String
+  countryCode_contains: String
+  countryCode_not_contains: String
+  countryCode_starts_with: String
+  countryCode_not_starts_with: String
+  countryCode_ends_with: String
+  countryCode_not_ends_with: String
+  countryCode_in: [String!]
+  countryCode_not_in: [String!]
+  callingCode: String
+  callingCode_not: String
+  callingCode_contains: String
+  callingCode_not_contains: String
+  callingCode_starts_with: String
+  callingCode_not_starts_with: String
+  callingCode_ends_with: String
+  callingCode_not_ends_with: String
+  callingCode_in: [String!]
+  callingCode_not_in: [String!]
   location: LocationDbObjectFilter
   viewport: ViewPortDbObjectFilter
 }
@@ -258,6 +291,9 @@ input PlaceDbObjectFilter {
 input PlaceDbObjectSort {
   placeId: SortOperationKind
   address: SortOperationKind
+  country: SortOperationKind
+  countryCode: SortOperationKind
+  callingCode: SortOperationKind
   location: LocationDbObjectSort
   viewport: ViewPortDbObjectSort
 }
@@ -265,6 +301,9 @@ input PlaceDbObjectSort {
 input PlaceRequestInput {
   placeId: String!
   address: String!
+  country: String!
+  countryCode: String!
+  callingCode: String!
   location: LocationRequestInput!
   viewport: ViewportRequestInput!
 }

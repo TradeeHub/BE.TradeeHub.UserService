@@ -1,4 +1,5 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
 using BE.TradeeHub.UserService.Domain.Interfaces;
@@ -142,6 +143,36 @@ public class AuthService
                 },
                 new AttributeType
                 {
+                    Name = "custom:location_lat",
+                    Value = request.Place.Location.Lat.ToString(CultureInfo.InvariantCulture)
+                },
+                new AttributeType
+                {
+                    Name = "custom:location_lng",
+                    Value = request.Place.Location.Lng.ToString(CultureInfo.InvariantCulture)
+                },
+                new AttributeType
+                {
+                    Name = "custom:place_id",
+                    Value = request.Place.PlaceId.ToString(CultureInfo.InvariantCulture)
+                },
+                new AttributeType
+                {
+                    Name = "custom:calling_code",
+                    Value = request.Place.CallingCode.ToString(CultureInfo.InvariantCulture)
+                },
+                new AttributeType
+                {
+                    Name = "custom:country",
+                    Value = request.Place.Country.ToString(CultureInfo.InvariantCulture)
+                },
+                new AttributeType
+                {
+                    Name = "custom:country_code",
+                    Value = request.Place.CountryCode.ToString(CultureInfo.InvariantCulture)
+                },
+                new AttributeType
+                {
                     Name = "custom:marketing_preference",
                     Value = request.MarketingPreference.ToString()
                 },
@@ -157,6 +188,7 @@ public class AuthService
                     Name = "phone_number",
                     Value = request.PhoneNumber
                 }
+                
                 // Add other attributes here if necessary
             }
         };
@@ -175,6 +207,9 @@ public class AuthService
             {
                 PlaceId = request.Place.PlaceId,
                 Address = request.Place.Address,
+                Country = request.Place.Country,
+                CountryCode = request.Place.CountryCode,
+                CallingCode = request.Place.CallingCode,
                 Location = new LocationDbObject()
                 {
                     Lat = request.Place.Location.Lat,

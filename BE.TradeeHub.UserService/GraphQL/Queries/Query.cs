@@ -25,15 +25,25 @@ public class Query
     
     [Authorize]
     [UseFirstOrDefault]
-    public UserDbObject GetLoggedInUser([Service] IMongoCollection<UserDbObject> collection, [Service] UserContext userContext)
+    public UserDbObject GetLoggedInUser([Service] UserContext userContext)
     {
         return new UserDbObject()
         {
             Id = userContext.UserId,
             Name = userContext.Name,
             CompanyName = userContext.CompanyName,
-            Email = userContext.Email
+            Email = userContext.Email,
+            Place = new PlaceDbObject()
+            {
+                CallingCode = userContext.CallingCode,
+                Country = userContext.Country,
+                CountryCode = userContext.CountryCode,
+                Location = new LocationDbObject()
+                {
+                    Lat = Convert.ToDecimal(userContext.LocationLat),
+                    Lng = Convert.ToDecimal(userContext.LocationLng)
+                }
+            }
         };
     }
-
 }
