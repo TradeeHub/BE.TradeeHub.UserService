@@ -30,6 +30,6 @@ public class UserContext
     public string LocationLat => _httpContextAccessor.HttpContext?.User.FindFirst("custom:location_lat")?.Value ?? throw new Exception("Location Lat claim not found.");
     public string LocationLng=> _httpContextAccessor.HttpContext?.User.FindFirst("custom:location_lng")?.Value ?? throw new Exception("Location Lng claim not found.");
     public string Country => _httpContextAccessor.HttpContext?.User.FindFirst("custom:country")?.Value ?? throw new Exception("Country claim not found.");
-    public string CountryCode => _httpContextAccessor.HttpContext?.User.FindFirst("custom:location_lng")?.Value ?? throw new Exception("Country Code claim not found.");
-    public string CallingCode => _httpContextAccessor.HttpContext?.User.FindFirst("custom:location_lng")?.Value ?? throw new Exception("Calling Code claim not found.");
+    public string CountryCode => _httpContextAccessor.HttpContext?.User.FindFirst("custom:country_code")?.Value ?? throw new Exception("Country Code claim not found.");
+    public string CallingCode => _httpContextAccessor.HttpContext?.User.FindFirst("custom:calling_code")?.Value ?? throw new Exception("Calling Code claim not found.");
 }
