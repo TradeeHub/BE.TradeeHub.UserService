@@ -134,8 +134,8 @@ type UserDbObject {
   referralSource: String!
   companyPriority: String!
   marketingPreference: Boolean!
-  createdDate: DateTime!
-  updatedDate: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime
   emailVerified: Boolean!
   phoneVerified: Boolean!
 }
@@ -428,30 +428,30 @@ input UserDbObjectFilter {
   companiesMemberOf_none: ISingleFilterOfGuidFilter
   companiesMemberOf_all: ISingleFilterOfGuidFilter
   companiesMemberOf_any: Boolean
-  createdDate: DateTime
-  createdDate_not: DateTime
-  createdDate_in: [DateTime!]
-  createdDate_not_in: [DateTime!]
-  createdDate_gt: DateTime
-  createdDate_not_gt: DateTime
-  createdDate_gte: DateTime
-  createdDate_not_gte: DateTime
-  createdDate_lt: DateTime
-  createdDate_not_lt: DateTime
-  createdDate_lte: DateTime
-  createdDate_not_lte: DateTime
-  updatedDate: DateTime
-  updatedDate_not: DateTime
-  updatedDate_in: [DateTime]
-  updatedDate_not_in: [DateTime]
-  updatedDate_gt: DateTime
-  updatedDate_not_gt: DateTime
-  updatedDate_gte: DateTime
-  updatedDate_not_gte: DateTime
-  updatedDate_lt: DateTime
-  updatedDate_not_lt: DateTime
-  updatedDate_lte: DateTime
-  updatedDate_not_lte: DateTime
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_gt: DateTime
+  createdAt_not_gt: DateTime
+  createdAt_gte: DateTime
+  createdAt_not_gte: DateTime
+  createdAt_lt: DateTime
+  createdAt_not_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_not_lte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime]
+  updatedAt_not_in: [DateTime]
+  updatedAt_gt: DateTime
+  updatedAt_not_gt: DateTime
+  updatedAt_gte: DateTime
+  updatedAt_not_gte: DateTime
+  updatedAt_lt: DateTime
+  updatedAt_not_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_not_lte: DateTime
   emailVerified: Boolean
   emailVerified_not: Boolean
   phoneVerified: Boolean
@@ -470,8 +470,8 @@ input UserDbObjectSort {
   referralSource: SortOperationKind
   companyPriority: SortOperationKind
   marketingPreference: SortOperationKind
-  createdDate: SortOperationKind
-  updatedDate: SortOperationKind
+  createdAt: SortOperationKind
+  updatedAt: SortOperationKind
   emailVerified: SortOperationKind
   phoneVerified: SortOperationKind
 }

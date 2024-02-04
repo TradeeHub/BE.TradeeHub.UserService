@@ -94,7 +94,7 @@ public class AuthService
             ReferralSource = request.ReferralSource,
             CompanyPriority = request.CompanyPriority,
             MarketingPreference = request.MarketingPreference,
-            CreatedDate = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow,
         };
 
         await _userRepository.AddUserAsync(user, ctx);
@@ -235,7 +235,7 @@ public class AuthService
             ReferralSource = request.ReferralSource,
             CompanyPriority = request.CompanyPriority,
             MarketingPreference = request.MarketingPreference,
-            CreatedDate = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow,
         };
 
         await _userRepository.AddUserAsync(user, ctx);

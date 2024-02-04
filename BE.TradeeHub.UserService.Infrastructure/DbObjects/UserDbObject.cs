@@ -19,8 +19,8 @@ public class UserDbObject
     public bool MarketingPreference { get; set; }
     public IEnumerable<Guid>? Staff { get; set; }
     public IEnumerable<Guid>? CompaniesMemberOf { get; set; }
-    public DateTime CreatedDate { get; set; }
-    public DateTime? UpdatedDate { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
     public bool EmailVerified { get; set; }
     public bool PhoneVerified { get; set; }
 }

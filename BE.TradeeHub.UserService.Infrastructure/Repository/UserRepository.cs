@@ -57,7 +57,7 @@ public class UserRepository
         var filter = Builders<UserDbObject>.Filter.Eq(u => u.Email, email);
         var update = Builders<UserDbObject>.Update
             .Set(u => u.EmailVerified, isVerified)
-            .Set(u => u.UpdatedDate, DateTime.UtcNow);
+            .Set(u => u.UpdatedAt, DateTime.UtcNow);
         
         await _dbContext.Users.UpdateOneAsync(filter, update, null, cancellationToken);
     }
