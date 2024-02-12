@@ -1,4 +1,5 @@
 ﻿using Amazon.CognitoIdentityProvider.Model;
+using BE.TradeeHub.UserService.Interfaces;
 using BE.TradeeHub.UserService.Requests;
 using BE.TradeeHub.UserService.Responses;
 using HotChocolate.Execution;
@@ -7,7 +8,7 @@ namespace BE.TradeeHub.UserService.GraphQL.Mutations;
 
 public class Mutation
 {
-    public async Task<SignUpResponse> RegisterAsync([Service] AuthService authService, RegisterRequest request,
+    public async Task<SignUpResponse> RegisterAsync([Service] IAuthService authService, RegisterRequest request,
         CancellationToken ctx)
     {
         try
@@ -22,7 +23,7 @@ public class Mutation
         }
     }
 
-    public async Task<LoginResponse> LoginAsync(LoginRequest request, [Service] AuthService authService,
+    public async Task<LoginResponse> LoginAsync(LoginRequest request, [Service] IAuthService authService,
         [Service] IHttpContextAccessor httpContextAccessor, CancellationToken ctx)
     {
         try
@@ -101,7 +102,7 @@ public class Mutation
         }
     }
 
-    public async Task<AccountConfirmationResponse> ConfirmAccountAsync([Service] AuthService authService,
+    public async Task<AccountConfirmationResponse> ConfirmAccountAsync([Service] IAuthService authService,
         string confirmationCode, string email, CancellationToken ctx)
     {
         try
@@ -138,7 +139,7 @@ public class Mutation
         }
     }
 
-    public async Task<ResendConfirmationCodeResponse> ResendVerificationCodeAsync([Service] AuthService authService,
+    public async Task<ResendConfirmationCodeResponse> ResendVerificationCodeAsync([Service] IAuthService authService,
         string email, CancellationToken ctx)
     {
         try
@@ -190,7 +191,7 @@ public class Mutation
         return new LogoutResponse() { Success = true, Message = "Logout Successful." };
     }
     
-    public async Task<ForgotPasswordResponse> ForgotPasswordAsync([Service] AuthService authService, string email, CancellationToken ctx)
+    public async Task<ForgotPasswordResponse> ForgotPasswordAsync([Service] IAuthService authService, string email, CancellationToken ctx)
     {
         try
         {
@@ -202,7 +203,7 @@ public class Mutation
         }
     }
     
-    public async Task<ConfirmForgotPasswordResponse> ChangePassword([Service] AuthService authService, ChangedForgottenPasswordRequest request, CancellationToken ctx)
+    public async Task<ConfirmForgotPasswordResponse> ChangePassword([Service] IAuthService authService, ChangedForgottenPasswordRequest request, CancellationToken ctx)
     {
         try
         {

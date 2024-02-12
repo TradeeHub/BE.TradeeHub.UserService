@@ -2,8 +2,7 @@
 
 public interface IAppSettings
 {
-    public string MongoDbConnectionString { get; set; }
-    public string MongoDbDatabaseName { get; set; }
-    public string AppClientId { get; set; }
-
+    public string MongoDbConnectionString { get; }
+    public string MongoDbDatabaseName { get; }
+    public string AppClientId { get; }
 }

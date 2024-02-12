@@ -1,20 +1,19 @@
-﻿using BE.TradeeHub.UserService.Infrastructure.DbObjects;
-using BE.TradeeHub.UserService.Infrastructure.Repository;
-using MongoDB.Bson;
+﻿using BE.TradeeHub.UserService.Domain.Entities;
+using BE.TradeeHub.UserService.Domain.Interfaces.Repositories;
 
 namespace BE.TradeeHub.UserService.GraphQL.DataLoaders;
 
-public class CompaniesMemberOfDataLoader : GroupedDataLoader<Guid, UserDbObject>
+public class CompaniesMemberOfDataLoader : GroupedDataLoader<Guid, UserEntity>
 {
-    private readonly UserRepository _userRepository;
+    private readonly IUserRepository _userRepository;
 
-    public CompaniesMemberOfDataLoader(IBatchScheduler batchScheduler, UserRepository userRepository, DataLoaderOptions? options = null)
+    public CompaniesMemberOfDataLoader(IBatchScheduler batchScheduler, IUserRepository userRepository, DataLoaderOptions? options = null)
         : base(batchScheduler, options)
     {
         _userRepository = userRepository;
     }
 
-    protected override async Task<ILookup<Guid, UserDbObject>> LoadGroupedBatchAsync(IReadOnlyList<Guid> staffIds, CancellationToken cancellationToken)
+    protected override async Task<ILookup<Guid, UserEntity>> LoadGroupedBatchAsync(IReadOnlyList<Guid> staffIds, CancellationToken cancellationToken)
     {
         var companies = await _userRepository.GetStaffByIds(staffIds, cancellationToken); //returns companies where the staff belongs to
 

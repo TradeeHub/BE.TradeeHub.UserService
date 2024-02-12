@@ -2,22 +2,23 @@
 using System.IdentityModel.Tokens.Jwt;
 using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
+using BE.TradeeHub.UserService.Domain.Entities;
 using BE.TradeeHub.UserService.Domain.Interfaces;
-using BE.TradeeHub.UserService.Infrastructure.DbObjects;
-using BE.TradeeHub.UserService.Infrastructure.Repository;
+using BE.TradeeHub.UserService.Domain.Interfaces.Repositories;
+using BE.TradeeHub.UserService.Interfaces;
 using BE.TradeeHub.UserService.Requests;
 using BE.TradeeHub.UserService.Responses;
 
 namespace BE.TradeeHub.UserService;
 
-public class AuthService
+public class AuthService : IAuthService
 {
     private readonly IAmazonCognitoIdentityProvider _cognitoService;
     private readonly IAppSettings _appSettings;
-    private readonly UserRepository _userRepository;
+    private readonly IUserRepository _userRepository;
 
     public AuthService(IAmazonCognitoIdentityProvider cognitoService, IAppSettings appSettings,
-        UserRepository userRepository)
+        IUserRepository userRepository)
     {
         _cognitoService = cognitoService;
         _appSettings = appSettings;
@@ -58,30 +59,30 @@ public class AuthService
         return response;
     }
 
-    public async Task<UserDbObject> AddRandomUser(RegisterRequest request, CancellationToken ctx)
+    public async Task<UserEntity> AddRandomUser(RegisterRequest request, CancellationToken ctx)
     {
-        var user = new UserDbObject
+        var user = new UserEntity
         {
             Email = request.Email,
             Name = request.Name,
             PhoneNumber = request.PhoneNumber,
-            Place = new PlaceDbObject()
+            Place = new PlaceEntity()
             {
                 PlaceId = request.Place.PlaceId,
                 Address = request.Place.Address,
-                Location = new LocationDbObject()
+                Location = new LocationEntity()
                 {
                     Lat = request.Place.Location.Lat,
                     Lng = request.Place.Location.Lng
                 },
-                Viewport = new ViewPortDbObject()
+                Viewport = new ViewportEntity()
                 {
-                    Northeast = new LocationDbObject()
+                    Northeast = new LocationEntity()
                     {
                         Lat = request.Place.Viewport.Northeast.Lat,
                         Lng = request.Place.Viewport.Northeast.Lng
                     },
-                    Southwest = new LocationDbObject()
+                    Southwest = new LocationEntity()
                     {
                         Lat = request.Place.Viewport.Southwest.Lat,
                         Lng = request.Place.Viewport.Southwest.Lng
@@ -197,32 +198,32 @@ public class AuthService
 
         if (response.HttpStatusCode != System.Net.HttpStatusCode.OK) return response;
 
-        var user = new UserDbObject
+        var user = new UserEntity
         {
             Id = Guid.Parse(response.UserSub),
             Email = request.Email,
             Name = request.Name,
             PhoneNumber = request.PhoneNumber,
-            Place = new PlaceDbObject()
+            Place = new PlaceEntity()
             {
                 PlaceId = request.Place.PlaceId,
                 Address = request.Place.Address,
                 Country = request.Place.Country,
                 CountryCode = request.Place.CountryCode,
                 CallingCode = request.Place.CallingCode,
-                Location = new LocationDbObject()
+                Location = new LocationEntity()
                 {
                     Lat = request.Place.Location.Lat,
                     Lng = request.Place.Location.Lng
                 },
-                Viewport = new ViewPortDbObject()
+                Viewport = new ViewportEntity()
                 {
-                    Northeast = new LocationDbObject()
+                    Northeast = new LocationEntity()
                     {
                         Lat = request.Place.Viewport.Northeast.Lat,
                         Lng = request.Place.Viewport.Northeast.Lng
                     },
-                    Southwest = new LocationDbObject()
+                    Southwest = new LocationEntity()
                     {
                         Lat = request.Place.Viewport.Southwest.Lat,
                         Lng = request.Place.Viewport.Southwest.Lng

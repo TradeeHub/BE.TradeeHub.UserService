@@ -1,4 +1,4 @@
-﻿using BE.TradeeHub.UserService.Infrastructure.DbObjects;
+﻿using BE.TradeeHub.UserService.Domain.Entities;
 
 namespace BE.TradeeHub.UserService.Responses;
 
@@ -6,5 +6,5 @@ public class LoginResponse
 {
     public bool IsSuccess { get; set; }
     public bool IsConfirmed { get; set; }
-    public UserDbObject? User { get; set; }
+    public UserEntity? User { get; set; }
 }

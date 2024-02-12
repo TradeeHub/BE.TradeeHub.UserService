@@ -1,13 +1,13 @@
-﻿using BE.TradeeHub.UserService.GraphQL.QueryResolvers;
-using BE.TradeeHub.UserService.Infrastructure.DbObjects;
+﻿using BE.TradeeHub.UserService.Domain.Entities;
+using BE.TradeeHub.UserService.GraphQL.QueryResolvers;
 using HotChocolate.Authorization;
 
 namespace BE.TradeeHub.UserService.GraphQL.Types;
 
 [Authorize]
-public class UserType : ObjectType<UserDbObject>
+public class UserType : ObjectType<UserEntity>
 {
-    protected override void Configure(IObjectTypeDescriptor<UserDbObject> descriptor)
+    protected override void Configure(IObjectTypeDescriptor<UserEntity> descriptor)
     {
         descriptor.Field(c => c.Staff)
             .ResolveWith<TypeResolver>(r => r.GetStaffMembers(default!, default!, default!))

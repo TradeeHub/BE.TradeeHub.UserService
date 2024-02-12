@@ -1,16 +1,15 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace BE.TradeeHub.UserService.Infrastructure.DbObjects;
+namespace BE.TradeeHub.UserService.Domain.Entities;
 
-public class UserDbObject 
+public class UserEntity 
 {
     [BsonId]
     public Guid Id { get; set; } //Aws Cognito generated UUID
     public string Email { get; set; }
     public string Name { get; set; }
     public string PhoneNumber { get; set; }
-    public PlaceDbObject Place { get; set; }
+    public PlaceEntity Place { get; set; }
     public string CompanyName { get; set; }
     public string CompanyType { get; set; }
     public string CompanySize { get; set; }

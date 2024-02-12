@@ -1,4 +1,4 @@
-﻿namespace BE.TradeeHub.UserService.Domain.Enteties;
+﻿namespace BE.TradeeHub.UserService.Domain.Entities;
 
 public class GeneralCompanyInfo
 {

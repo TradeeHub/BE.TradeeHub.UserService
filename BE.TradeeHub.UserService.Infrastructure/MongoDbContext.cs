@@ -1,5 +1,5 @@
-﻿using BE.TradeeHub.UserService.Domain.Interfaces;
-using BE.TradeeHub.UserService.Infrastructure.DbObjects;
+﻿using BE.TradeeHub.UserService.Domain.Entities;
+using BE.TradeeHub.UserService.Domain.Interfaces;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -20,5 +20,5 @@ public class MongoDbContext
         _database = client.GetDatabase(appSettings.MongoDbDatabaseName);
     }
     
-    public IMongoCollection<UserDbObject> Users => _database.GetCollection<UserDbObject>("Users");
+    public IMongoCollection<UserEntity> Users => _database.GetCollection<UserEntity>("Users");
 }

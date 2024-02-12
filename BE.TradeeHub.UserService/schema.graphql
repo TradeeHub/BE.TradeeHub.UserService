@@ -43,7 +43,7 @@ type KeyValuePairOfStringAndString {
   value: String!
 }
 
-type LocationDbObject {
+type LocationEntity {
   lat: Decimal!
   lng: Decimal!
 }
@@ -51,7 +51,7 @@ type LocationDbObject {
 type LoginResponse {
   isSuccess: Boolean!
   isConfirmed: Boolean!
-  user: UserDbObject
+  user: UserEntity
 }
 
 type LogoutResponse {
@@ -81,20 +81,20 @@ type PageInfo {
   endCursor: String
 }
 
-type PlaceDbObject {
+type PlaceEntity {
   placeId: String!
   address: String!
   country: String!
   countryCode: String!
   callingCode: String!
-  location: LocationDbObject!
-  viewport: ViewPortDbObject!
+  location: LocationEntity!
+  viewport: ViewportEntity!
 }
 
 type Query {
-  users("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String order_by: UserDbObjectSort where: UserDbObjectFilter): UsersConnection
-  userByAwsCognitoId(id: UUID!): [UserDbObject!]! @authorize
-  loggedInUser: UserDbObject @authorize
+  users("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String order_by: UserEntitySort where: UserEntityFilter): UsersConnection
+  userByAwsCognitoId(id: UUID!): [UserEntity!]! @authorize
+  loggedInUser: UserEntity @authorize
 }
 
 type ResendConfirmationCodeResponse {
@@ -120,14 +120,14 @@ type SignUpResponse {
   httpStatusCode: HttpStatusCode!
 }
 
-type UserDbObject {
-  staff: [UserDbObject]
-  companiesMemberOf: [UserDbObject]
+type UserEntity {
+  staff: [UserEntity]
+  companiesMemberOf: [UserEntity]
   id: UUID!
   email: String!
   name: String!
   phoneNumber: String!
-  place: PlaceDbObject!
+  place: PlaceEntity!
   companyName: String!
   companyType: String!
   companySize: String!
@@ -147,7 +147,7 @@ type UsersConnection {
   "A list of edges."
   edges: [UsersEdge!]
   "A flattened list of the nodes."
-  nodes: [UserDbObject!]
+  nodes: [UserEntity!]
 }
 
 "An edge in a connection."
@@ -155,12 +155,12 @@ type UsersEdge {
   "A cursor for use in pagination."
   cursor: String!
   "The item at the end of the edge."
-  node: UserDbObject!
+  node: UserEntity!
 }
 
-type ViewPortDbObject {
-  northeast: LocationDbObject!
-  southwest: LocationDbObject!
+type ViewportEntity {
+  northeast: LocationEntity!
+  southwest: LocationEntity!
 }
 
 input ChangedForgottenPasswordRequestInput {
@@ -186,9 +186,9 @@ input ISingleFilterOfGuidFilter {
   element_not_lte: UUID
 }
 
-input LocationDbObjectFilter {
-  AND: [LocationDbObjectFilter!]
-  OR: [LocationDbObjectFilter!]
+input LocationEntityFilter {
+  AND: [LocationEntityFilter!]
+  OR: [LocationEntityFilter!]
   lat: Decimal
   lat_not: Decimal
   lat_in: [Decimal!]
@@ -215,7 +215,7 @@ input LocationDbObjectFilter {
   lng_not_lte: Decimal
 }
 
-input LocationDbObjectSort {
+input LocationEntitySort {
   lat: SortOperationKind
   lng: SortOperationKind
 }
@@ -231,9 +231,9 @@ input LoginRequestInput {
   rememberMe: Boolean!
 }
 
-input PlaceDbObjectFilter {
-  AND: [PlaceDbObjectFilter!]
-  OR: [PlaceDbObjectFilter!]
+input PlaceEntityFilter {
+  AND: [PlaceEntityFilter!]
+  OR: [PlaceEntityFilter!]
   placeId: String
   placeId_not: String
   placeId_contains: String
@@ -284,18 +284,18 @@ input PlaceDbObjectFilter {
   callingCode_not_ends_with: String
   callingCode_in: [String!]
   callingCode_not_in: [String!]
-  location: LocationDbObjectFilter
-  viewport: ViewPortDbObjectFilter
+  location: LocationEntityFilter
+  viewport: ViewportEntityFilter
 }
 
-input PlaceDbObjectSort {
+input PlaceEntitySort {
   placeId: SortOperationKind
   address: SortOperationKind
   country: SortOperationKind
   countryCode: SortOperationKind
   callingCode: SortOperationKind
-  location: LocationDbObjectSort
-  viewport: ViewPortDbObjectSort
+  location: LocationEntitySort
+  viewport: ViewportEntitySort
 }
 
 input PlaceRequestInput {
@@ -322,9 +322,9 @@ input RegisterRequestInput {
   marketingPreference: Boolean!
 }
 
-input UserDbObjectFilter {
-  AND: [UserDbObjectFilter!]
-  OR: [UserDbObjectFilter!]
+input UserEntityFilter {
+  AND: [UserEntityFilter!]
+  OR: [UserEntityFilter!]
   id: UUID
   id_not: UUID
   id_in: [UUID!]
@@ -367,7 +367,7 @@ input UserDbObjectFilter {
   phoneNumber_not_ends_with: String
   phoneNumber_in: [String!]
   phoneNumber_not_in: [String!]
-  place: PlaceDbObjectFilter
+  place: PlaceEntityFilter
   companyName: String
   companyName_not: String
   companyName_contains: String
@@ -458,12 +458,12 @@ input UserDbObjectFilter {
   phoneVerified_not: Boolean
 }
 
-input UserDbObjectSort {
+input UserEntitySort {
   id: SortOperationKind
   email: SortOperationKind
   name: SortOperationKind
   phoneNumber: SortOperationKind
-  place: PlaceDbObjectSort
+  place: PlaceEntitySort
   companyName: SortOperationKind
   companyType: SortOperationKind
   companySize: SortOperationKind
@@ -476,16 +476,16 @@ input UserDbObjectSort {
   phoneVerified: SortOperationKind
 }
 
-input ViewPortDbObjectFilter {
-  AND: [ViewPortDbObjectFilter!]
-  OR: [ViewPortDbObjectFilter!]
-  northeast: LocationDbObjectFilter
-  southwest: LocationDbObjectFilter
+input ViewportEntityFilter {
+  AND: [ViewportEntityFilter!]
+  OR: [ViewportEntityFilter!]
+  northeast: LocationEntityFilter
+  southwest: LocationEntityFilter
 }
 
-input ViewPortDbObjectSort {
-  northeast: LocationDbObjectSort
-  southwest: LocationDbObjectSort
+input ViewportEntitySort {
+  northeast: LocationEntitySort
+  southwest: LocationEntitySort
 }
 
 input ViewportRequestInput {

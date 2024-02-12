@@ -1,12 +1,12 @@
-﻿using BE.TradeeHub.UserService.GraphQL.DataLoaders;
-using BE.TradeeHub.UserService.Infrastructure.DbObjects;
+﻿using BE.TradeeHub.UserService.Domain.Entities;
+using BE.TradeeHub.UserService.GraphQL.DataLoaders;
 
 namespace BE.TradeeHub.UserService.GraphQL.QueryResolvers;
 
 public class TypeResolver
 {
-    public async Task<IEnumerable<UserDbObject>?> GetStaffMembers(
-        [Parent] UserDbObject user, [Service] StaffDataLoader staffDataLoader, 
+    public async Task<IEnumerable<UserEntity>?> GetStaffMembers(
+        [Parent] UserEntity user, [Service] StaffDataLoader staffDataLoader, 
         CancellationToken ctx)
     {
         if (user.Staff != null)
@@ -17,8 +17,8 @@ public class TypeResolver
         return null;
     }
     
-    public async Task<IEnumerable<UserDbObject>?> GetCompaniesImMemberOf(
-        [Parent] UserDbObject user, [Service] CompaniesMemberOfDataLoader companiesMemberOfDataLoader, 
+    public async Task<IEnumerable<UserEntity>?> GetCompaniesImMemberOf(
+        [Parent] UserEntity user, [Service] CompaniesMemberOfDataLoader companiesMemberOfDataLoader, 
         CancellationToken ctx)
     {
         if (user.CompaniesMemberOf != null)

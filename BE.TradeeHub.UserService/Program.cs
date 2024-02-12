@@ -1,15 +1,17 @@
 using Amazon.CognitoIdentityProvider;
 using Amazon.Runtime;
 using BE.TradeeHub.UserService;
+using BE.TradeeHub.UserService.Domain.Entities;
 using BE.TradeeHub.UserService.Domain.Interfaces;
+using BE.TradeeHub.UserService.Domain.Interfaces.Repositories;
 using BE.TradeeHub.UserService.GraphQL.DataLoaders;
 using BE.TradeeHub.UserService.GraphQL.Mutations;
 using BE.TradeeHub.UserService.GraphQL.Queries;
 using BE.TradeeHub.UserService.GraphQL.QueryResolvers;
 using BE.TradeeHub.UserService.GraphQL.Types;
 using BE.TradeeHub.UserService.Infrastructure;
-using BE.TradeeHub.UserService.Infrastructure.DbObjects;
 using BE.TradeeHub.UserService.Infrastructure.Repository;
+using BE.TradeeHub.UserService.Interfaces;
 using BE.TradeeHub.UserService.Services;
 using HotChocolate.Execution;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -36,15 +38,15 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddCognitoIdentity();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<MongoDbContext>();
-builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<StaffDataLoader>();
 builder.Services.AddScoped<CompaniesMemberOfDataLoader>();
-builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<TypeResolver>();
-builder.Services.AddScoped<UserContext>(); // Add UserContext as a scoped service
-builder.Services.AddSingleton<IMongoCollection<UserDbObject>>(serviceProvider =>
+builder.Services.AddScoped<UserContext>();
+builder.Services.AddSingleton<IMongoCollection<UserEntity>>(serviceProvider =>
 {
     var mongoDbContext = serviceProvider.GetRequiredService<MongoDbContext>();
     return mongoDbContext.Users; // Assuming this is the property name in MongoDbContext for the collection
