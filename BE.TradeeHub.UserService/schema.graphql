@@ -103,6 +103,7 @@ type Query {
   nodes("The list of node IDs." ids: [ID!]!): [Node]!
   users("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String order_by: UserEntitySort where: UserEntityFilter): UsersConnection
   userByAwsCognitoId(id: UUID!): [UserEntity!]! @authorize
+  user(id: ID!): UserEntity @authorize
   loggedInUser: UserEntity @authorize
 }
 

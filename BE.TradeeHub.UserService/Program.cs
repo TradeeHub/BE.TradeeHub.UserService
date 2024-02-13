@@ -41,6 +41,7 @@ builder.Services.AddCognitoIdentity();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<MongoDbContext>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<StaffDataLoader>();
 builder.Services.AddScoped<CompaniesMemberOfDataLoader>();
 builder.Services.AddScoped<UserService>();
@@ -105,8 +106,8 @@ builder.Services.AddAuthorization();
 
 builder.Services
     .AddGraphQLServer()
-    // .AddApolloFederation()
     .AddGlobalObjectIdentification()
+    .AddProjections()
     .AddAuthorization()
     .AddDataLoader<StaffDataLoader>()
     .AddDataLoader<CompaniesMemberOfDataLoader>()

@@ -9,7 +9,7 @@ using BE.TradeeHub.UserService.Interfaces;
 using BE.TradeeHub.UserService.Requests;
 using BE.TradeeHub.UserService.Responses;
 
-namespace BE.TradeeHub.UserService;
+namespace BE.TradeeHub.UserService.Services;
 
 public class AuthService : IAuthService
 {

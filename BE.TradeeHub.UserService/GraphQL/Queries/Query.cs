@@ -1,4 +1,5 @@
 ﻿using BE.TradeeHub.UserService.Domain.Entities;
+using BE.TradeeHub.UserService.Interfaces;
 using HotChocolate.Authorization;
 using HotChocolate.Data;
 using MongoDB.Driver;
@@ -16,13 +17,22 @@ public class Query
         var collect = collection.AsExecutable();
         return collect;
     }
-    
+
     [Authorize]
-    public IExecutable<UserEntity> GetUserByAwsCognitoId([Service] IMongoCollection<UserEntity> collection, Guid Id, CancellationToken ctx)
+    public IExecutable<UserEntity> GetUserByAwsCognitoId([Service] IMongoCollection<UserEntity> collection, Guid id,
+        CancellationToken ctx)
     {
-        return collection.Find(x => x.Id == Id).AsExecutable();
+        return collection.Find(x => x.Id == id).AsExecutable();
     }
-    
+
+    [Authorize]
+    [NodeResolver]
+    public async Task<UserEntity?> GetUser([Service] IMongoCollection<UserEntity> collection, Guid id, CancellationToken ctx)
+    {
+        var filter = Builders<UserEntity>.Filter.Eq(x => x.Id, id);
+        return await collection.Find(filter).FirstOrDefaultAsync(ctx);
+    }
+
     [Authorize]
     [UseFirstOrDefault]
     public UserEntity GetLoggedInUser([Service] UserContext userContext)

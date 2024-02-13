@@ -1,9 +1,11 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using HotChocolate.Types.Relay;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace BE.TradeeHub.UserService.Domain.Entities;
 
 public class UserEntity 
 {
+    [ID]
     [BsonId]
     public Guid Id { get; set; } //Aws Cognito generated UUID
     public string Email { get; set; }
