@@ -14,14 +14,21 @@ public class UserRepository : IUserRepository
         _dbContext = dbContext;
     }
     
-    public async Task<UserEntity?> GetCustomerById(Guid awsUserId, CancellationToken ctx)
+    public async Task<UserEntity?> GetUserByIdAsync(Guid awsUserId, CancellationToken ctx)
     {
         var filter = Builders<UserEntity>.Filter.Eq(user => user.Id, awsUserId);
 
         return await _dbContext.Users.Find(filter).FirstOrDefaultAsync(ctx);
     }
     
-    public async Task<IEnumerable<UserEntity>?> GetStaffByIds(IEnumerable<Guid> staffIds, CancellationToken ctx)
+    public async Task<List<UserEntity>?> GetUsersByIdsAsync(IEnumerable<Guid> awsUserIds, CancellationToken ctx)
+    {
+        var filter = Builders<UserEntity>.Filter.In(user => user.Id, awsUserIds);
+
+        return await _dbContext.Users.Find(filter).ToListAsync(ctx);
+    }
+
+    public async Task<IEnumerable<UserEntity>?> GetStaffByIdsAsync(IEnumerable<Guid> staffIds, CancellationToken ctx)
     {
         // The filter should be on the Customers field, not the Id field
         var filter = Builders<UserEntity>.Filter.AnyIn(p => p.Staff, staffIds);
@@ -31,7 +38,7 @@ public class UserRepository : IUserRepository
         return staff; 
     }
     
-    public async Task<IEnumerable<UserEntity>?> GetCompaniesMemberOfByIds(IEnumerable<Guid> companyIds, CancellationToken ctx)
+    public async Task<IEnumerable<UserEntity>?> GetCompaniesMemberOfByIdsAsync(IEnumerable<Guid> companyIds, CancellationToken ctx)
     {
         // The filter should be on the Customers field, not the Id field
         var filter = Builders<UserEntity>.Filter.AnyIn(p => p.CompaniesMemberOf, companyIds);
@@ -53,7 +60,7 @@ public class UserRepository : IUserRepository
         }
     }
 
-    public async Task UpdateUserEmailVerifiedStatus(string email, bool isVerified, CancellationToken cancellationToken)
+    public async Task UpdateUserEmailVerifiedStatusAsync(string email, bool isVerified, CancellationToken cancellationToken)
     {
         var filter = Builders<UserEntity>.Filter.Eq(u => u.Email, email);
         var update = Builders<UserEntity>.Update

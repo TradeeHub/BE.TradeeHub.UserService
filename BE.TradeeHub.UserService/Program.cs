@@ -105,6 +105,8 @@ builder.Services.AddAuthorization();
 
 builder.Services
     .AddGraphQLServer()
+    // .AddApolloFederation()
+    .AddGlobalObjectIdentification()
     .AddAuthorization()
     .AddDataLoader<StaffDataLoader>()
     .AddDataLoader<CompaniesMemberOfDataLoader>()

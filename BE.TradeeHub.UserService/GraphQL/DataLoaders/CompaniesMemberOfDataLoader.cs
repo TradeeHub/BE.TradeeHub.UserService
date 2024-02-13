@@ -15,7 +15,7 @@ public class CompaniesMemberOfDataLoader : GroupedDataLoader<Guid, UserEntity>
 
     protected override async Task<ILookup<Guid, UserEntity>> LoadGroupedBatchAsync(IReadOnlyList<Guid> staffIds, CancellationToken cancellationToken)
     {
-        var companies = await _userRepository.GetStaffByIds(staffIds, cancellationToken); //returns companies where the staff belongs to
+        var companies = await _userRepository.GetStaffByIdsAsync(staffIds, cancellationToken); //returns companies where the staff belongs to
 
         return staffIds
             .SelectMany(staffId => 

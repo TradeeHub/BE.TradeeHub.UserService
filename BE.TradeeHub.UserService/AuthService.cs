@@ -40,7 +40,7 @@ public class AuthService : IAuthService
         if (confirmationResponse.HttpStatusCode == System.Net.HttpStatusCode.OK)
         {
             // If the confirmation is successful, update the user in MongoDB
-            await _userRepository.UpdateUserEmailVerifiedStatus(email, true, ctx);
+            await _userRepository.UpdateUserEmailVerifiedStatusAsync(email, true, ctx);
         }
 
         return confirmationResponse;
@@ -271,7 +271,7 @@ public class AuthService : IAuthService
 
         if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId)) return null;
 
-        var user = await _userRepository.GetCustomerById(userId, ctx);
+        var user = await _userRepository.GetUserByIdAsync(userId, ctx);
 
         if (user == null) return null;
 

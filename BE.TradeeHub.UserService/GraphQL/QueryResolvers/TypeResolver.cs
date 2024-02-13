@@ -5,6 +5,14 @@ namespace BE.TradeeHub.UserService.GraphQL.QueryResolvers;
 
 public class TypeResolver
 {
+    public async Task<UserEntity?> GetUser(
+        [Parent] UserEntity user, [Service] UserDataLoader userDataLoader, 
+        CancellationToken ctx)
+    {
+        var userEntity = await userDataLoader.LoadAsync(user.Id, ctx);
+        return userEntity.FirstOrDefault();   
+    }
+    
     public async Task<IEnumerable<UserEntity>?> GetStaffMembers(
         [Parent] UserEntity user, [Service] StaffDataLoader staffDataLoader, 
         CancellationToken ctx)
