@@ -107,7 +107,6 @@ builder.Services.AddAuthorization();
 builder.Services
     .AddGraphQLServer()
     .AddGlobalObjectIdentification()
-    .AddProjections()
     .AddAuthorization()
     .AddDataLoader<StaffDataLoader>()
     .AddDataLoader<CompaniesMemberOfDataLoader>()
