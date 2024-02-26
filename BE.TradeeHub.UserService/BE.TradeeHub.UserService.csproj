@@ -18,14 +18,14 @@
 
     <ItemGroup>
       <PackageReference Include="Amazon.AspNetCore.Identity.Cognito" Version="3.0.1" />
-      <PackageReference Include="AWSSDK.CognitoIdentityProvider" Version="3.7.301.20" />
+      <PackageReference Include="AWSSDK.CognitoIdentityProvider" Version="3.7.302.7" />
       <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.300" />
-      <PackageReference Include="HotChocolate.AspNetCore" Version="13.8.1" />
-      <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="13.8.1" />
-      <PackageReference Include="HotChocolate.Data.MongoDb" Version="13.8.1" />
-      <PackageReference Include="HotChocolate.Types.Filters" Version="13.8.1" />
-      <PackageReference Include="HotChocolate.Types.Sorting" Version="13.8.1" />
-      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.1" />
+      <PackageReference Include="HotChocolate.AspNetCore" Version="13.9.0" />
+      <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="13.9.0" />
+      <PackageReference Include="HotChocolate.Data.MongoDb" Version="13.9.0" />
+      <PackageReference Include="HotChocolate.Types.Filters" Version="13.9.0" />
+      <PackageReference Include="HotChocolate.Types.Sorting" Version="13.9.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.2" />
     </ItemGroup>
 
     <ItemGroup>

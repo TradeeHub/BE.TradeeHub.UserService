@@ -1,5 +1,4 @@
 ﻿using BE.TradeeHub.UserService.Domain.Entities;
-using BE.TradeeHub.UserService.Interfaces;
 using HotChocolate.Authorization;
 using HotChocolate.Data;
 using MongoDB.Driver;
