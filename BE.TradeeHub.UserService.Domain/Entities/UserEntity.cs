@@ -11,6 +11,8 @@ public class UserEntity
     public string Email { get; set; }
     public string Name { get; set; }
     public string PhoneNumber { get; set; }
+    public string CurrencySymbol { get; set; }
+    public string? Currency { get; set; }
     public PlaceEntity Place { get; set; }
     public string CompanyName { get; set; }
     public string CompanyType { get; set; }

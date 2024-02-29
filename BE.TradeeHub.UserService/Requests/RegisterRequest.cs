@@ -6,6 +6,8 @@ public class RegisterRequest
     public string Password { get; set; }
     public string Name { get; set; }
     public string PhoneNumber { get; set; }
+    public string CurrencySymbol { get; set; }
+    public string Currency { get; set; }
     public PlaceRequest Place { get; set; }
     public string CompanyName { get; set; }
     public string CompanyType { get; set; }

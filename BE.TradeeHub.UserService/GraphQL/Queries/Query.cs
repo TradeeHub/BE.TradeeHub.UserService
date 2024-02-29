@@ -40,6 +40,8 @@ public class Query
         {
             Id = userContext.UserId,
             Name = userContext.Name,
+            Currency = userContext.Currency,
+            CurrencySymbol = userContext.CurrencySymbol,
             CompanyName = userContext.CompanyName,
             Email = userContext.Email,
             Place = new PlaceEntity()

@@ -66,6 +66,8 @@ public class AuthService : IAuthService
             Email = request.Email,
             Name = request.Name,
             PhoneNumber = request.PhoneNumber,
+            CurrencySymbol = request.CurrencySymbol,
+            Currency = request.Currency,
             Place = new PlaceEntity()
             {
                 PlaceId = request.Place.PlaceId,
@@ -174,6 +176,16 @@ public class AuthService : IAuthService
                 },
                 new AttributeType
                 {
+                    Name = "custom:currency_symbol",
+                    Value = request.CurrencySymbol
+                },
+                new AttributeType
+                {
+                    Name = "custom:currency",
+                    Value = request.Currency
+                },
+                new AttributeType
+                {
                     Name = "custom:marketing_preference",
                     Value = request.MarketingPreference.ToString()
                 },
@@ -204,6 +216,8 @@ public class AuthService : IAuthService
             Email = request.Email,
             Name = request.Name,
             PhoneNumber = request.PhoneNumber,
+            CurrencySymbol = request.CurrencySymbol,
+            Currency = request.Currency,
             Place = new PlaceEntity()
             {
                 PlaceId = request.Place.PlaceId,

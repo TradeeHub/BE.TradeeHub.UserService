@@ -137,6 +137,8 @@ type UserEntity implements Node {
   email: String!
   name: String!
   phoneNumber: String!
+  currencySymbol: String!
+  currency: String
   place: PlaceEntity!
   companyName: String!
   companyType: String!
@@ -323,6 +325,8 @@ input RegisterRequestInput {
   password: String!
   name: String!
   phoneNumber: String!
+  currencySymbol: String!
+  currency: String!
   place: PlaceRequestInput!
   companyName: String!
   companyType: String!
@@ -377,6 +381,26 @@ input UserEntityFilter {
   phoneNumber_not_ends_with: String
   phoneNumber_in: [String!]
   phoneNumber_not_in: [String!]
+  currencySymbol: String
+  currencySymbol_not: String
+  currencySymbol_contains: String
+  currencySymbol_not_contains: String
+  currencySymbol_starts_with: String
+  currencySymbol_not_starts_with: String
+  currencySymbol_ends_with: String
+  currencySymbol_not_ends_with: String
+  currencySymbol_in: [String!]
+  currencySymbol_not_in: [String!]
+  currency: String
+  currency_not: String
+  currency_contains: String
+  currency_not_contains: String
+  currency_starts_with: String
+  currency_not_starts_with: String
+  currency_ends_with: String
+  currency_not_ends_with: String
+  currency_in: [String]
+  currency_not_in: [String]
   place: PlaceEntityFilter
   companyName: String
   companyName_not: String
@@ -473,6 +497,8 @@ input UserEntitySort {
   email: SortOperationKind
   name: SortOperationKind
   phoneNumber: SortOperationKind
+  currencySymbol: SortOperationKind
+  currency: SortOperationKind
   place: PlaceEntitySort
   companyName: SortOperationKind
   companyType: SortOperationKind
