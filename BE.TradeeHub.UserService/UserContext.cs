@@ -33,6 +33,5 @@ public class UserContext
     public string CountryCode => _httpContextAccessor.HttpContext?.User.FindFirst("custom:country_code")?.Value ?? throw new Exception("Country Code claim not found.");
     public string CallingCode => _httpContextAccessor.HttpContext?.User.FindFirst("custom:calling_code")?.Value ?? throw new Exception("Calling Code claim not found.");
     public string CurrencySymbol => _httpContextAccessor.HttpContext?.User.FindFirst("custom:currency_symbol")?.Value ?? throw new Exception("Currency Symbol claim not found.");
-    public string Currency => _httpContextAccessor.HttpContext?.User.FindFirst("custom:currency_symbol")?.Value ?? throw new Exception("Currency claim not found.");
-
+    public string Currency => _httpContextAccessor.HttpContext?.User.FindFirst("custom:currency")?.Value ?? throw new Exception("Currency claim not found.");
 }
